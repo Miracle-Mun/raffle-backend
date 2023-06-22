@@ -10,7 +10,7 @@ const getRaffles = async () => {
     return raffles;
   }
   catch (error) {
-    return null;
+    return error;
   }
 }
 
