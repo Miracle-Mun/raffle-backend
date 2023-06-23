@@ -1,7 +1,7 @@
-import CONFIG_DEV from './dev';
-// import CONFIG_MAIN from './main';
+// import CONFIG_DEV from './dev';
+import CONFIG_MAIN from './main';
 
-const CONFIG = CONFIG_DEV;
-// const CONFIG = CONFIG_MAIN;
+// const CONFIG = CONFIG_DEV;
+const CONFIG = CONFIG_MAIN;
 
 export default CONFIG;

@@ -17,14 +17,14 @@ export default {
   SOLANA_NETWORK: 'mainnet',
 
   AUCTION: {
-    PROGRAM_ID: 'HQYQ5NCn8bSZkeXrECGXrrQX6xnj312rNyH4KJSMniK5',
+    PROGRAM_ID: 'Tcj9AK7eauCQwtNjAF3WRP6uoLn1eYuAH1Fpp68zZt5',
     POOL_SEED: 'pool',
     IDL: AUCTION_IDL.IDL,
     PAY_TOKEN_DECIMAL: 1000000000,
     message: 'Auction Message'
   },
   RAFFLE: {
-    PROGRAM_ID: 'BMqGz73MkSqc2q28ecGDBhjPYB59WwXn6hiZBTpkqxqL',
+    PROGRAM_ID: '2Dbz7X5ACyQFn5C2RJ6G84vu37jzpzoLQJrfYvt9d5W9',
     POOL_SEED: 'pool',
     IDL: RAFFLE_IDL.IDL,
     PAY_TOKEN_DECIMAL: 1000000000,
