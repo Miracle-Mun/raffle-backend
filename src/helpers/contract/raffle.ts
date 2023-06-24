@@ -20,7 +20,7 @@ import CONFIG from '../../config'
 import NodeWallet from '@project-serum/anchor/dist/cjs/nodewallet';
 
 const {
-  ADMIN,
+  WINNER_WALLET,
   CLUSTER_API
 } = CONFIG;
 
@@ -31,7 +31,7 @@ const connection = new Connection(CLUSTER_API, {
   preflightCommitment: 'confirmed' as Commitment,
 } as ConnectionConfig);
 
-const ADMIN_WALLET = Keypair.fromSeed(Uint8Array.from(ADMIN).slice(0, 32));
+const ADMIN_WALLET = Keypair.fromSeed(Uint8Array.from(WINNER_WALLET).slice(0, 32));
 
 const provider = new anchor.AnchorProvider(connection, new NodeWallet(ADMIN_WALLET), {
   skipPreflight: true,
@@ -40,164 +40,164 @@ const provider = new anchor.AnchorProvider(connection, new NodeWallet(ADMIN_WALL
 
 const program = new anchor.Program(IDL, PROGRAM_ID, provider);
 
-export const createRaffle = async (
-  raffleId: number,
-  mint: PublicKey,
-  startTime: number,
-  endTime: number,
-  totalTicket: number | null,
-  price: number
-): Promise<Boolean> => {
+// export const createRaffle = async (
+//   raffleId: number,
+//   mint: PublicKey,
+//   startTime: number,
+//   endTime: number,
+//   totalTicket: number | null,
+//   price: number
+// ): Promise<Boolean> => {
 
-  try {
-    const id = new anchor.BN(raffleId);
-    const [pool] = await PublicKey.findProgramAddress(
-      [Buffer.from(POOL_SEED),
-      id.toArrayLike(Buffer, 'le', 8),
-      mint.toBuffer()],
-      program.programId
-    );
+//   try {
+//     const id = new anchor.BN(raffleId);
+//     const [pool] = await PublicKey.findProgramAddress(
+//       [Buffer.from(POOL_SEED),
+//       id.toArrayLike(Buffer, 'le', 8),
+//       mint.toBuffer()],
+//       program.programId
+//     );
 
-    let ataFrom = await getAssociatedTokenAddress(mint, ADMIN_WALLET.publicKey);
-    console.log('ataFrom', ataFrom);
+//     let ataFrom = await getAssociatedTokenAddress(mint, ADMIN_WALLET.publicKey);
+//     console.log('ataFrom', ataFrom);
 
-    let ataTo = await getAssociatedTokenAddress(mint, pool, true);
-    const builder = program.methods.createRaffle(
-      new anchor.BN(raffleId),
-      startTime,
-      endTime,
-      totalTicket,
-      new anchor.BN(price * PAY_TOKEN_DECIMAL)
-    );
+//     let ataTo = await getAssociatedTokenAddress(mint, pool, true);
+//     const builder = program.methods.createRaffle(
+//       new anchor.BN(raffleId),
+//       startTime,
+//       endTime,
+//       totalTicket,
+//       new anchor.BN(price * PAY_TOKEN_DECIMAL)
+//     );
 
-    builder.accounts({
-      admin: ADMIN_WALLET.publicKey,
-      mint: mint,
-      pool: pool,
-      ataFrom: ataFrom,
-      ataTo: ataTo,
-      tokenProgram: TOKEN_PROGRAM_ID,
-      associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
-      systemProgram: SystemProgram.programId,
-      rent: SYSVAR_RENT_PUBKEY
-    });
+//     builder.accounts({
+//       admin: ADMIN_WALLET.publicKey,
+//       mint: mint,
+//       pool: pool,
+//       ataFrom: ataFrom,
+//       ataTo: ataTo,
+//       tokenProgram: TOKEN_PROGRAM_ID,
+//       associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
+//       systemProgram: SystemProgram.programId,
+//       rent: SYSVAR_RENT_PUBKEY
+//     });
 
-    builder.signers([ADMIN_WALLET]);
-    const response = await builder.simulate({
-      commitment: 'confirmed'
-    });
+//     builder.signers([ADMIN_WALLET]);
+//     const response = await builder.simulate({
+//       commitment: 'confirmed'
+//     });
 
-    console.log('response', response);
-    if (!response) return false;
-    const txId = await builder.rpc();
-    console.log('txId', txId);
-    if (!txId) return false;
+//     console.log('response', response);
+//     if (!response) return false;
+//     const txId = await builder.rpc();
+//     console.log('txId', txId);
+//     if (!txId) return false;
 
-    return true;
-  }
-  catch (error) {
-    console.log('error', error);
-  }
+//     return true;
+//   }
+//   catch (error) {
+//     console.log('error', error);
+//   }
 
-  return false;
-};
+//   return false;
+// };
 
-export const editRaffle = async (
-  raffleId: number,
-  mint: PublicKey,
-  startTime: number,
-  endTime: number,
-  totalTicket: number | null,
-  price: number
-): Promise<Boolean> => {
+// export const editRaffle = async (
+//   raffleId: number,
+//   mint: PublicKey,
+//   startTime: number,
+//   endTime: number,
+//   totalTicket: number | null,
+//   price: number
+// ): Promise<Boolean> => {
 
-  try {
-    const id = new anchor.BN(raffleId);
-    const [pool] = await PublicKey.findProgramAddress(
-      [Buffer.from(POOL_SEED),
-      id.toArrayLike(Buffer, 'le', 8),
-      mint.toBuffer()],
-      program.programId
-    );
+//   try {
+//     const id = new anchor.BN(raffleId);
+//     const [pool] = await PublicKey.findProgramAddress(
+//       [Buffer.from(POOL_SEED),
+//       id.toArrayLike(Buffer, 'le', 8),
+//       mint.toBuffer()],
+//       program.programId
+//     );
 
-    const builder = program.methods.editRaffle(
-      startTime,
-      endTime,
-      totalTicket,
-      new anchor.BN(price * PAY_TOKEN_DECIMAL)
-    );
+//     const builder = program.methods.editRaffle(
+//       startTime,
+//       endTime,
+//       totalTicket,
+//       new anchor.BN(price * PAY_TOKEN_DECIMAL)
+//     );
 
-    builder.accounts({
-      admin: ADMIN_WALLET.publicKey,
-      pool: pool
-    });
+//     builder.accounts({
+//       admin: ADMIN_WALLET.publicKey,
+//       pool: pool
+//     });
 
-    builder.signers([ADMIN_WALLET]);
-    const response = await builder.simulate({
-      commitment: 'confirmed'
-    });
+//     builder.signers([ADMIN_WALLET]);
+//     const response = await builder.simulate({
+//       commitment: 'confirmed'
+//     });
 
-    if (!response) return false;
-    const txId = await builder.rpc();
-    if (!txId) return false;
+//     if (!response) return false;
+//     const txId = await builder.rpc();
+//     if (!txId) return false;
 
-    return true;
-  }
-  catch (error) {
-    console.log('error', error);
-  }
+//     return true;
+//   }
+//   catch (error) {
+//     console.log('error', error);
+//   }
 
-  return false;
-};
+//   return false;
+// };
 
-export const deleteRaffle = async (
-  raffleId: number,
-  mint: PublicKey
-): Promise<Boolean> => {
+// export const deleteRaffle = async (
+//   raffleId: number,
+//   mint: PublicKey
+// ): Promise<Boolean> => {
 
-  try {
-    console.log('raffle Id', raffleId);
-    const id = new anchor.BN(raffleId);
-    const [pool] = await PublicKey.findProgramAddress(
-      [Buffer.from(POOL_SEED),
-      id.toArrayLike(Buffer, 'le', 8),
-      mint.toBuffer()],
-      program.programId
-    );
+//   try {
+//     console.log('raffle Id', raffleId);
+//     const id = new anchor.BN(raffleId);
+//     const [pool] = await PublicKey.findProgramAddress(
+//       [Buffer.from(POOL_SEED),
+//       id.toArrayLike(Buffer, 'le', 8),
+//       mint.toBuffer()],
+//       program.programId
+//     );
 
-    const builder = program.methods.deleteRaffle();
-    let ataFrom = await getAssociatedTokenAddress(mint, pool, true);
-    let ataTo = await getAssociatedTokenAddress(mint, ADMIN_WALLET.publicKey);
+//     const builder = program.methods.deleteRaffle();
+//     let ataFrom = await getAssociatedTokenAddress(mint, pool, true);
+//     let ataTo = await getAssociatedTokenAddress(mint, ADMIN_WALLET.publicKey);
 
-    builder.accounts({
-      admin: ADMIN_WALLET.publicKey,
-      pool: pool,
-      mint,
-      ataFrom,
-      ataTo,
-      tokenProgram: TOKEN_PROGRAM_ID,
-      associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
-      systemProgram: SystemProgram.programId,
-      rent: SYSVAR_RENT_PUBKEY
-    });
+//     builder.accounts({
+//       admin: ADMIN_WALLET.publicKey,
+//       pool: pool,
+//       mint,
+//       ataFrom,
+//       ataTo,
+//       tokenProgram: TOKEN_PROGRAM_ID,
+//       associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
+//       systemProgram: SystemProgram.programId,
+//       rent: SYSVAR_RENT_PUBKEY
+//     });
 
-    builder.signers([ADMIN_WALLET]);
-    const response = await builder.simulate({
-      commitment: 'confirmed'
-    });
+//     builder.signers([ADMIN_WALLET]);
+//     const response = await builder.simulate({
+//       commitment: 'confirmed'
+//     });
 
-    if (!response) return false;
-    const txId = await builder.rpc();
-    if (!txId) return false;
+//     if (!response) return false;
+//     const txId = await builder.rpc();
+//     if (!txId) return false;
 
-    return true;
-  }
-  catch (error) {
-    console.log('error', error);
-  }
+//     return true;
+//   }
+//   catch (error) {
+//     console.log('error', error);
+//   }
 
-  return false;
-};
+//   return false;
+// };
 
 
 export const setWinner = async (

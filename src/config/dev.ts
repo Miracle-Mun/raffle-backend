@@ -1,10 +1,11 @@
-import ADMIN_KEYPAIR from './devnet.json';
+import WINNER_KEYPAIR from './winner_dev.json';
 import { IDL } from '../constants/idl/escrow';
 import * as AUCTION_IDL from '../constants/idl/auction'
 import * as RAFFLE_IDL from '../constants/idl/raffle'
 
 export default {
-  ADMIN: ADMIN_KEYPAIR,
+  WINNER_WALLET: WINNER_KEYPAIR,
+  ADMIN_WALLET_PUB: '3ttYrBAp5D2sTG2gaBjg8EtrZecqBQSBuFRhsqHWPYxX',
   IDL: IDL,
   PROGRAM_ID: '3nYqaNUEhW4gwkNHanSPeTExTuerisrCU71EpxQm3W6N',
   ESCROW_SEEDS: 'escrow',

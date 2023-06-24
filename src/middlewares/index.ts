@@ -1,7 +1,9 @@
 import jwt from "jsonwebtoken";
 import authService from "../services/authService";
-import { ADMIN_WALLET } from "../helpers/contract/auction";
 import User from "../models/user";
+import CONFIG from "../config";
+
+const { ADMIN_WALLET_PUB } = CONFIG;
 
 export const verifyAdmin = (type: number) => async (req, res, next) => {
   try {
@@ -13,7 +15,7 @@ export const verifyAdmin = (type: number) => async (req, res, next) => {
       else data[key] = req.body[key];
     })
 
-    const result = await authService.verify(ADMIN_WALLET.publicKey.toString(), signedMessage, type);
+    const result = await authService.verify(ADMIN_WALLET_PUB, signedMessage, type);
     if (!result) return res.json(null);
     console.log('data111', data)
     req.body = data;

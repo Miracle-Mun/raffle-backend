@@ -22,7 +22,7 @@ import NodeWallet from '@project-serum/anchor/dist/cjs/nodewallet';
 import { delay, INTERVAL, LOOP, SPL_ASSOCIATED_TOKEN_ACCOUNT_PROGRAM_ID } from '../utils';
 import RewardNftModel from '../../models/rewardNft';
 const {
-  ADMIN,
+  WINNER_WALLET,
   IDL,
   CLUSTER_API,
   PROGRAM_ID,
@@ -34,7 +34,7 @@ const connection = new Connection(CLUSTER_API, {
   preflightCommitment: 'confirmed' as Commitment,
 } as ConnectionConfig);
 
-const ADMIN_WALLET = Keypair.fromSeed(Uint8Array.from(ADMIN).slice(0, 32));
+const ADMIN_WALLET = Keypair.fromSeed(Uint8Array.from(WINNER_WALLET).slice(0, 32));
 
 const provider = new anchor.AnchorProvider(connection, new NodeWallet(ADMIN_WALLET), {
   skipPreflight: true,

@@ -8,7 +8,7 @@ import {
 } from '@solana/web3.js';
 import CONFIG from '../../config';
 const {
-  ADMIN,
+  WINNER_WALLET,
   CLUSTER_API,
   BUNDLR_URL,
   SOLANA_NETWORK,
@@ -24,7 +24,7 @@ const createIrl = async (data: any) => {
       preflightCommitment: 'confirmed' as Commitment,
     } as ConnectionConfig);
 
-    const ADMIN_WALLET = Keypair.fromSeed(Uint8Array.from(ADMIN).slice(0, 32));
+    const ADMIN_WALLET = Keypair.fromSeed(Uint8Array.from(WINNER_WALLET).slice(0, 32));
     const metaplex = Metaplex.make(connection, { cluster: 'devnet' })
       .use(keypairIdentity(ADMIN_WALLET))
       .use(bundlrStorage({
