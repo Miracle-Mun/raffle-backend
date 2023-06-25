@@ -1,4 +1,3 @@
-import { IDL } from '../constants/idl/escrow';
 import * as AUCTION_IDL from '../constants/idl/auction'
 import * as RAFFLE_IDL from '../constants/idl/raffle'
 import WINNER_KEYPAIR from './winner_main.json';
@@ -6,9 +5,7 @@ import WINNER_KEYPAIR from './winner_main.json';
 export default {
   WINNER_WALLET: WINNER_KEYPAIR,
   ADMIN_WALLET_PUB: 'DBadiSE9HsUhKqSmcNnsVtzUuwAeLtGFVCKY6LC1W9us',
-  IDL: IDL,
   PROGRAM_ID: '3nYqaNUEhW4gwkNHanSPeTExTuerisrCU71EpxQm3W6N',
-  ESCROW_SEEDS: 'escrow',
   CLUSTER_API: 'https://capable-burned-shape.solana-mainnet.quiknode.pro/904288623a1e9c412e5da6f5204baa74aa652938/',
   BUNDLR_URL: 'https://node1.bundlr.network',
   ENV: 'dev',

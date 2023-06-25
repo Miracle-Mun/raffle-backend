@@ -1,6 +1,5 @@
 import { Router } from 'express';
 import authRoutes from './authRoutes';
-import escrowRoutes from './escrowRoutes';
 import auctionRoutes from './auctionRoutes';
 import raffleRoutes from './raffleRoutes';
 import userRoutes from './userRoutes';
@@ -12,7 +11,6 @@ const router = Router()
 
 router.use('/auth', authRoutes)
 router.use('/oauth', oauthRoutes)
-router.use('/escrow', escrowRoutes)
 router.use('/auction', auctionRoutes)
 router.use('/raffle', raffleRoutes)
 router.use('/user', userRoutes)
