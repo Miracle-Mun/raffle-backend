@@ -13,6 +13,7 @@ export interface Raffle {
   signedMessage: string | null,
   price: number | null,
   total_tickets: number | null,
+  min_nft_count: number | null,
   start_date: number | null,
   end_date: number | null,
   state: number | null
@@ -31,6 +32,7 @@ const Raffle: Schema<Raffle> = new Schema<Raffle>({
   signedMessage: { type: String },
   price: { type: Number, required: true },
   total_tickets: { type: Number, required: false },
+  min_nft_count: { type: Number, required: true },
   start_date: { type: Number, required: true },
   end_date: { type: Number, required: true },
   state: { type: Number, default: 0 },
