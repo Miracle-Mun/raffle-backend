@@ -14,7 +14,9 @@ const getRaffle = async (req, res) => {
 const createRaffle = async (req, res) => {
   const result = await raffleService.createRaffle({
     ...req.body,
-    total_tickets: req.body.total_tickets !== 'null' ? Number(req.body.total_tickets) : null
+    total_tickets: req.body.total_tickets !== 'null' ? Number(req.body.total_tickets) : null,
+    price: req.body.price !== 'null' ? Number(req.body.price) : null,
+    min_nft_count: req.body.min_nft_count !== 'null' ? Number(req.body.min_nft_count) : null
   });
   return res.json(result);
 }

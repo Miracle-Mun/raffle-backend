@@ -12,6 +12,7 @@ export interface Auction {
   twitter: string | null,
   signedMessage: string | null,
   min_bid_amount: number | null,
+  min_nft_count: number | null,
   start_date: number | null,
   end_date: number | null,
 }
@@ -28,6 +29,7 @@ const Auction: Schema<Auction> = new Schema<Auction>({
   twitter: { type: String, required: true },
   signedMessage: { type: String },
   min_bid_amount: { type: Number, required: true },
+  min_nft_count: { type: Number, required: true },
   start_date: { type: Number, required: true },
   end_date: { type: Number, required: true },
 })

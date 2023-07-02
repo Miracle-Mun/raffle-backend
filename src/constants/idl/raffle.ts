@@ -65,6 +65,10 @@ export type Raffle = {
           "type": "u32"
         },
         {
+          "name": "minNftCount",
+          "type": "u32"
+        },
+        {
           "name": "totalTicket",
           "type": {
             "option": "u32"
@@ -104,6 +108,10 @@ export type Raffle = {
           "type": {
             "option": "u32"
           }
+        },
+        {
+          "name": "minNftCount",
+          "type": "u32"
         },
         {
           "name": "price",
@@ -230,6 +238,10 @@ export type Raffle = {
         {
           "name": "amount",
           "type": "u32"
+        },
+        {
+          "name": "nftCount",
+          "type": "u32"
         }
       ]
     },
@@ -348,6 +360,10 @@ export type Raffle = {
             "type": "u32"
           },
           {
+            "name": "mintNftCount",
+            "type": "u32"
+          },
+          {
             "name": "totalTicket",
             "type": "u32"
           },
@@ -398,46 +414,51 @@ export type Raffle = {
     },
     {
       "code": 6002,
+      "name": "InsufficientNft",
+      "msg": "Insufficient NFT"
+    },
+    {
+      "code": 6003,
       "name": "NotFinishRaffle",
       "msg": "Raffle isn't finished"
     },
     {
-      "code": 6003,
+      "code": 6004,
       "name": "OverMaxCount",
       "msg": "Over max count"
     },
     {
-      "code": 6004,
+      "code": 6005,
       "name": "OutOfRaffle",
       "msg": "Raffle had finished or not exist"
     },
     {
-      "code": 6005,
+      "code": 6006,
       "name": "AlreadySetWinner",
       "msg": "Alreay set winner"
     },
     {
-      "code": 6006,
+      "code": 6007,
       "name": "SetWinnerError",
       "msg": "Error in set winner"
     },
     {
-      "code": 6007,
+      "code": 6008,
       "name": "StartedRaffle",
       "msg": "Raffle already started"
     },
     {
-      "code": 6008,
+      "code": 6009,
       "name": "TooManyTicket",
       "msg": "Too many ticket"
     },
     {
-      "code": 6009,
+      "code": 6010,
       "name": "NotWinner",
       "msg": "Not winner"
     },
     {
-      "code": 6010,
+      "code": 6011,
       "name": "ClaimPrizeError",
       "msg": "Error in claim prize"
     }
@@ -511,6 +532,10 @@ export const IDL: Raffle = {
           "type": "u32"
         },
         {
+          "name": "minNftCount",
+          "type": "u32"
+        },
+        {
           "name": "totalTicket",
           "type": {
             "option": "u32"
@@ -550,6 +575,10 @@ export const IDL: Raffle = {
           "type": {
             "option": "u32"
           }
+        },
+        {
+          "name": "minNftCount",
+          "type": "u32"
         },
         {
           "name": "price",
@@ -676,6 +705,10 @@ export const IDL: Raffle = {
         {
           "name": "amount",
           "type": "u32"
+        },
+        {
+          "name": "nftCount",
+          "type": "u32"
         }
       ]
     },
@@ -794,6 +827,10 @@ export const IDL: Raffle = {
             "type": "u32"
           },
           {
+            "name": "mintNftCount",
+            "type": "u32"
+          },
+          {
             "name": "totalTicket",
             "type": "u32"
           },
@@ -844,46 +881,51 @@ export const IDL: Raffle = {
     },
     {
       "code": 6002,
+      "name": "InsufficientNft",
+      "msg": "Insufficient NFT"
+    },
+    {
+      "code": 6003,
       "name": "NotFinishRaffle",
       "msg": "Raffle isn't finished"
     },
     {
-      "code": 6003,
+      "code": 6004,
       "name": "OverMaxCount",
       "msg": "Over max count"
     },
     {
-      "code": 6004,
+      "code": 6005,
       "name": "OutOfRaffle",
       "msg": "Raffle had finished or not exist"
     },
     {
-      "code": 6005,
+      "code": 6006,
       "name": "AlreadySetWinner",
       "msg": "Alreay set winner"
     },
     {
-      "code": 6006,
+      "code": 6007,
       "name": "SetWinnerError",
       "msg": "Error in set winner"
     },
     {
-      "code": 6007,
+      "code": 6008,
       "name": "StartedRaffle",
       "msg": "Raffle already started"
     },
     {
-      "code": 6008,
+      "code": 6009,
       "name": "TooManyTicket",
       "msg": "Too many ticket"
     },
     {
-      "code": 6009,
+      "code": 6010,
       "name": "NotWinner",
       "msg": "Not winner"
     },
     {
-      "code": 6010,
+      "code": 6011,
       "name": "ClaimPrizeError",
       "msg": "Error in claim prize"
     }

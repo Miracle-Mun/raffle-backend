@@ -65,6 +65,10 @@ export type Auction = {
           "type": "u32"
         },
         {
+          "name": "minNftCount",
+          "type": "u32"
+        },
+        {
           "name": "minPrice",
           "type": "u64"
         }
@@ -91,6 +95,10 @@ export type Auction = {
         },
         {
           "name": "endTime",
+          "type": "u32"
+        },
+        {
+          "name": "minNftCount",
           "type": "u32"
         },
         {
@@ -203,6 +211,10 @@ export type Auction = {
         {
           "name": "price",
           "type": "u64"
+        },
+        {
+          "name": "nftCount",
+          "type": "u32"
         }
       ]
     },
@@ -259,6 +271,10 @@ export type Auction = {
         {
           "name": "price",
           "type": "u64"
+        },
+        {
+          "name": "nftCount",
+          "type": "u32"
         }
       ]
     },
@@ -439,6 +455,10 @@ export type Auction = {
             "type": "u32"
           },
           {
+            "name": "minNftCount",
+            "type": "u32"
+          },
+          {
             "name": "minPrice",
             "type": "u64"
           },
@@ -499,68 +519,78 @@ export type Auction = {
     },
     {
       "code": 6001,
+      "name": "InvalidNft",
+      "msg": "Invalid Nft"
+    },
+    {
+      "code": 6002,
       "name": "OutOfAuction",
       "msg": "Auction had finished or not exist"
     },
     {
-      "code": 6002,
+      "code": 6003,
       "name": "NotFinishAuction",
       "msg": "Auction isn't finished"
     },
     {
-      "code": 6003,
+      "code": 6004,
       "name": "OverMaxCount",
       "msg": "Over max count"
     },
     {
-      "code": 6004,
+      "code": 6005,
       "name": "CreateBidError",
       "msg": "Error in crate bid"
     },
     {
-      "code": 6005,
+      "code": 6006,
       "name": "UpdateBidError",
       "msg": "Error in update bid"
     },
     {
-      "code": 6006,
+      "code": 6007,
       "name": "CancelBidError",
       "msg": "Error in cancel bid"
     },
     {
-      "code": 6007,
+      "code": 6008,
       "name": "ClaimBidError",
       "msg": "Error in claim bid"
     },
     {
-      "code": 6008,
+      "code": 6009,
       "name": "AlreadyClaimed",
       "msg": "Already claimed"
     },
     {
-      "code": 6009,
+      "code": 6010,
       "name": "AlreadyClaimedPrize",
       "msg": "Already claimed prize"
     },
     {
-      "code": 6010,
+      "code": 6011,
       "name": "NotWinner",
       "msg": "Not winner"
     },
     {
-      "code": 6011,
+      "code": 6012,
       "name": "ClaimPrizeError",
       "msg": "Error in claim prize"
     },
     {
-      "code": 6012,
+      "code": 6013,
       "name": "SetWinnerError",
       "msg": "Error in set winner"
     },
     {
-      "code": 6013,
+      "code": 6014,
       "name": "StartedAuction",
       "msg": "Auction already started"
+    },
+    {
+      "code": 6015,
+      "name": "InsufficientNft",
+      "msg": "Insufficient NFT"
     }
   ]
 };
@@ -632,6 +662,10 @@ export const IDL: Auction = {
           "type": "u32"
         },
         {
+          "name": "minNftCount",
+          "type": "u32"
+        },
+        {
           "name": "minPrice",
           "type": "u64"
         }
@@ -658,6 +692,10 @@ export const IDL: Auction = {
         },
         {
           "name": "endTime",
+          "type": "u32"
+        },
+        {
+          "name": "minNftCount",
           "type": "u32"
         },
         {
@@ -770,6 +808,10 @@ export const IDL: Auction = {
         {
           "name": "price",
           "type": "u64"
+        },
+        {
+          "name": "nftCount",
+          "type": "u32"
         }
       ]
     },
@@ -826,6 +868,10 @@ export const IDL: Auction = {
         {
           "name": "price",
           "type": "u64"
+        },
+        {
+          "name": "nftCount",
+          "type": "u32"
         }
       ]
     },
@@ -1006,6 +1052,10 @@ export const IDL: Auction = {
             "type": "u32"
           },
           {
+            "name": "minNftCount",
+            "type": "u32"
+          },
+          {
             "name": "minPrice",
             "type": "u64"
           },
@@ -1066,68 +1116,78 @@ export const IDL: Auction = {
     },
     {
       "code": 6001,
+      "name": "InvalidNft",
+      "msg": "Invalid Nft"
+    },
+    {
+      "code": 6002,
       "name": "OutOfAuction",
       "msg": "Auction had finished or not exist"
     },
     {
-      "code": 6002,
+      "code": 6003,
       "name": "NotFinishAuction",
       "msg": "Auction isn't finished"
     },
     {
-      "code": 6003,
+      "code": 6004,
       "name": "OverMaxCount",
       "msg": "Over max count"
     },
     {
-      "code": 6004,
+      "code": 6005,
       "name": "CreateBidError",
       "msg": "Error in crate bid"
     },
     {
-      "code": 6005,
+      "code": 6006,
       "name": "UpdateBidError",
       "msg": "Error in update bid"
     },
     {
-      "code": 6006,
+      "code": 6007,
       "name": "CancelBidError",
       "msg": "Error in cancel bid"
     },
     {
-      "code": 6007,
+      "code": 6008,
       "name": "ClaimBidError",
       "msg": "Error in claim bid"
     },
     {
-      "code": 6008,
+      "code": 6009,
       "name": "AlreadyClaimed",
       "msg": "Already claimed"
     },
     {
-      "code": 6009,
+      "code": 6010,
       "name": "AlreadyClaimedPrize",
       "msg": "Already claimed prize"
     },
     {
-      "code": 6010,
+      "code": 6011,
       "name": "NotWinner",
       "msg": "Not winner"
     },
     {
-      "code": 6011,
+      "code": 6012,
       "name": "ClaimPrizeError",
       "msg": "Error in claim prize"
     },
     {
-      "code": 6012,
+      "code": 6013,
       "name": "SetWinnerError",
       "msg": "Error in set winner"
     },
     {
-      "code": 6013,
+      "code": 6014,
       "name": "StartedAuction",
       "msg": "Auction already started"
+    },
+    {
+      "code": 6015,
+      "name": "InsufficientNft",
+      "msg": "Insufficient NFT"
     }
   ]
 };
