@@ -65,12 +65,12 @@ export type Auction = {
           "type": "u32"
         },
         {
-          "name": "minNftCount",
-          "type": "u32"
-        },
-        {
           "name": "minPrice",
           "type": "u64"
+        },
+        {
+          "name": "minNftCount",
+          "type": "u32"
         }
       ]
     },
@@ -98,13 +98,13 @@ export type Auction = {
           "type": "u32"
         },
         {
+          "name": "minPrice",
+          "type": "u64"
+        },
+        {
           "name": "minNftCount",
           "type": "u32"
         },
-        {
-          "name": "minPrice",
-          "type": "u64"
-        }
       ]
     },
     {
@@ -455,10 +455,6 @@ export type Auction = {
             "type": "u32"
           },
           {
-            "name": "minNftCount",
-            "type": "u32"
-          },
-          {
             "name": "minPrice",
             "type": "u64"
           },
@@ -479,6 +475,10 @@ export type Auction = {
           },
           {
             "name": "state",
+            "type": "u32"
+          },
+          {
+            "name": "minNftCount",
             "type": "u32"
           }
         ]
@@ -662,12 +662,12 @@ export const IDL: Auction = {
           "type": "u32"
         },
         {
-          "name": "minNftCount",
-          "type": "u32"
-        },
-        {
           "name": "minPrice",
           "type": "u64"
+        },
+        {
+          "name": "minNftCount",
+          "type": "u32"
         }
       ]
     },
@@ -695,12 +695,12 @@ export const IDL: Auction = {
           "type": "u32"
         },
         {
-          "name": "minNftCount",
-          "type": "u32"
-        },
-        {
           "name": "minPrice",
           "type": "u64"
+        },
+        {
+          "name": "minNftCount",
+          "type": "u32"
         }
       ]
     },
@@ -1052,10 +1052,6 @@ export const IDL: Auction = {
             "type": "u32"
           },
           {
-            "name": "minNftCount",
-            "type": "u32"
-          },
-          {
             "name": "minPrice",
             "type": "u64"
           },
@@ -1076,6 +1072,10 @@ export const IDL: Auction = {
           },
           {
             "name": "state",
+            "type": "u32"
+          },
+          {
+            "name": "minNftCount",
             "type": "u32"
           }
         ]

@@ -65,10 +65,6 @@ export type Raffle = {
           "type": "u32"
         },
         {
-          "name": "minNftCount",
-          "type": "u32"
-        },
-        {
           "name": "totalTicket",
           "type": {
             "option": "u32"
@@ -77,6 +73,10 @@ export type Raffle = {
         {
           "name": "price",
           "type": "u64"
+        },
+        {
+          "name": "minNftCount",
+          "type": "u32"
         }
       ]
     },
@@ -110,12 +110,12 @@ export type Raffle = {
           }
         },
         {
-          "name": "minNftCount",
-          "type": "u32"
-        },
-        {
           "name": "price",
           "type": "u64"
+        },
+        {
+          "name": "minNftCount",
+          "type": "u32"
         }
       ]
     },
@@ -360,10 +360,6 @@ export type Raffle = {
             "type": "u32"
           },
           {
-            "name": "mintNftCount",
-            "type": "u32"
-          },
-          {
             "name": "totalTicket",
             "type": "u32"
           },
@@ -373,6 +369,10 @@ export type Raffle = {
           },
           {
             "name": "state",
+            "type": "u32"
+          },
+          {
+            "name": "mintNftCount",
             "type": "u32"
           }
         ]
@@ -532,10 +532,6 @@ export const IDL: Raffle = {
           "type": "u32"
         },
         {
-          "name": "minNftCount",
-          "type": "u32"
-        },
-        {
           "name": "totalTicket",
           "type": {
             "option": "u32"
@@ -544,6 +540,10 @@ export const IDL: Raffle = {
         {
           "name": "price",
           "type": "u64"
+        },
+        {
+          "name": "minNftCount",
+          "type": "u32"
         }
       ]
     },
@@ -577,12 +577,12 @@ export const IDL: Raffle = {
           }
         },
         {
-          "name": "minNftCount",
-          "type": "u32"
-        },
-        {
           "name": "price",
           "type": "u64"
+        },
+        {
+          "name": "minNftCount",
+          "type": "u32"
         }
       ]
     },
@@ -827,10 +827,6 @@ export const IDL: Raffle = {
             "type": "u32"
           },
           {
-            "name": "mintNftCount",
-            "type": "u32"
-          },
-          {
             "name": "totalTicket",
             "type": "u32"
           },
@@ -840,6 +836,10 @@ export const IDL: Raffle = {
           },
           {
             "name": "state",
+            "type": "u32"
+          },
+          {
+            "name": "mintNftCount",
             "type": "u32"
           }
         ]
