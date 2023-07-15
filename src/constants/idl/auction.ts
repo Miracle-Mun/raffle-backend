@@ -430,6 +430,62 @@ export type Auction = {
         }
       ],
       "args": []
+    },
+    {
+      "name": "sendBackNft",
+      "accounts": [
+        {
+          "name": "partner",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "admin",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "pool",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "mint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "ataFrom",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "ataTo",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "associatedTokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
     }
   ],
   "accounts": [
@@ -591,6 +647,16 @@ export type Auction = {
       "code": 6015,
       "name": "InsufficientNft",
       "msg": "Insufficient NFT"
+    },
+    {
+      "code": 6016,
+      "name": "AlreadySendBack",
+      "msg": "Already send back NFT"
+    },
+    {
+      "code": 6017,
+      "name": "AlreadySetWinner",
+      "msg": "Already setted winner"
     }
   ]
 };
@@ -701,7 +767,7 @@ export const IDL: Auction = {
         {
           "name": "minNftCount",
           "type": "u32"
-        }
+        },
       ]
     },
     {
@@ -1027,6 +1093,62 @@ export const IDL: Auction = {
         }
       ],
       "args": []
+    },
+    {
+      "name": "sendBackNft",
+      "accounts": [
+        {
+          "name": "partner",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "admin",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "pool",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "mint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "ataFrom",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "ataTo",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "associatedTokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
     }
   ],
   "accounts": [
@@ -1188,6 +1310,16 @@ export const IDL: Auction = {
       "code": 6015,
       "name": "InsufficientNft",
       "msg": "Insufficient NFT"
+    },
+    {
+      "code": 6016,
+      "name": "AlreadySendBack",
+      "msg": "Already send back NFT"
+    },
+    {
+      "code": 6017,
+      "name": "AlreadySetWinner",
+      "msg": "Already setted winner"
     }
   ]
 };

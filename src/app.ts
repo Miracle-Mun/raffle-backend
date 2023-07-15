@@ -6,10 +6,22 @@ import cors from 'cors';
 // import passport from 'passport';
 import routes from './routes';
 import RaffleModel from './models/raffle';
-import { setWinner } from './helpers/contract/raffle';
-import { PublicKey } from '@solana/web3.js';
+import AuctionModel from './models/auction';
+import { setWinner, sendBackNftForRaffle } from './helpers/contract/raffle';
+import { sendBackNftForAuction } from './helpers/contract/auction';
+import * as anchor from "@project-serum/anchor";
+import NodeWallet from '@project-serum/anchor/dist/cjs/nodewallet';
+import { 
+  PublicKey,   
+  Keypair,
+  Connection,
+  Commitment,
+  ConnectionConfig
+} from '@solana/web3.js';
 import { delay } from './helpers/utils';
+import CONFIG from './config'
 
+const { WINNER_WALLET } = CONFIG
 // require('./helpers/discordPassport');
 // require('./helpers/twitterPassport');
 
@@ -58,16 +70,125 @@ const checkRaffles = async () => {
       if (currentTime > raffle.end_date) {
         console.log('raffleID', raffle.id);
         console.log('raffle mint', raffle.mint);
-        let res;
+        let res1;
         try {
-          res = await setWinner(raffle.id, new PublicKey(raffle.mint));
+          res1 = await setWinner(raffle.id, new PublicKey(raffle.mint));
         } catch(error) {
           // console.log('error', error)
         }
-         
-        if (res) {
+        if (res1) {
           raffle.state = 1;
           await raffle.save();
+        }
+
+        let res2;
+        try {
+          res2 = await sendBackNftForRaffle(raffle.id, new PublicKey(raffle.mint));
+        } catch(error) {
+        
+        }
+        if (res2) {
+          raffle.state = 3;
+          await raffle.save();
+        } else {
+          const connection = new Connection(CONFIG.CLUSTER_API, {
+            skipPreflight: true,
+            preflightCommitment: "confirmed" as Commitment,
+          } as ConnectionConfig);
+
+          const ADMIN_WALLET = Keypair.fromSeed(Uint8Array.from(WINNER_WALLET).slice(0, 32));
+          const provider = new anchor.AnchorProvider(connection,  new NodeWallet(ADMIN_WALLET), {
+            skipPreflight: true,
+            preflightCommitment: "confirmed" as Commitment,
+          } as ConnectionConfig);
+
+          const program = new anchor.Program(
+            CONFIG.AUCTION.IDL,
+            CONFIG.AUCTION.PROGRAM_ID,
+            provider
+          );
+            
+          const raffleId = new anchor.BN(raffle.id);
+          const [pool] = await PublicKey.findProgramAddress(
+            [
+              Buffer.from(CONFIG.RAFFLE.POOL_SEED),
+              raffleId.toArrayLike(Buffer, "le", 8),
+              new PublicKey(raffle.mint).toBuffer(),
+            ],
+            program.programId
+          );
+          const poolData = await program.account.pool.fetch(pool);
+          if(poolData.state === 2) {
+            raffle.state = 2;
+            await raffle.save();
+          }
+        }
+      }
+    }
+  }
+  catch (error) {
+    // console.log('error', error);
+  }
+}
+
+
+const checkAuctions = async () => {
+  try {
+    const currentTime = Math.floor(Date.now() / 1000);
+    const auctions = await AuctionModel.find({ state: 0 });
+    for (let i = 0; i < auctions.length; i++) {
+      let auction = auctions[i];
+      if (currentTime > auction.end_date) {
+        console.log('raffleID', auction.id);
+        console.log('raffle mint', auction.mint);
+        let res;
+        try {
+          res = await sendBackNftForAuction(auction.id, new PublicKey(auction.mint));
+        } catch(error) {
+          // console.log('error', error)
+        }
+        if (res) {
+          auction.state = 3;
+          await auction.save();
+        } else {
+          const connection = new Connection(CONFIG.CLUSTER_API, {
+            skipPreflight: true,
+            preflightCommitment: "confirmed" as Commitment,
+          } as ConnectionConfig);
+
+          const ADMIN_WALLET = Keypair.fromSeed(Uint8Array.from(WINNER_WALLET).slice(0, 32));
+          const provider = new anchor.AnchorProvider(connection,  new NodeWallet(ADMIN_WALLET), {
+            skipPreflight: true,
+            preflightCommitment: "confirmed" as Commitment,
+          } as ConnectionConfig);
+
+          const program = new anchor.Program(
+            CONFIG.AUCTION.IDL,
+            CONFIG.AUCTION.PROGRAM_ID,
+            provider
+          );
+
+        let pool;
+          try {
+            const auctionId = new anchor.BN(auction.id);
+            [pool] = await PublicKey.findProgramAddress(
+              [
+                Buffer.from(CONFIG.RAFFLE.POOL_SEED),
+                auctionId.toArrayLike(Buffer, "le", 8),
+                new PublicKey(auction.mint).toBuffer(),
+              ],
+              program.programId
+            );
+          } catch (error) {
+
+          }
+
+          const poolData = await program.account.pool.fetch(pool);
+          
+          if(poolData.state === 2) {
+            auction.state = 2;
+            await auction.save();
+          }
         }
       }
     }
@@ -81,6 +202,7 @@ const checkRaffles = async () => {
 (async () => {
   for (let i = 0; i < 1;) {
     await checkRaffles();
+    await checkAuctions();
     await delay(60 * 1000)
   }
 })()

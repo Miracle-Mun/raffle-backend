@@ -21,6 +21,7 @@ import NodeWallet from '@project-serum/anchor/dist/cjs/nodewallet';
 
 const {
   WINNER_WALLET,
+  ADMIN_WALLET_PUB,
   CLUSTER_API
 } = CONFIG;
 
@@ -236,6 +237,62 @@ export const setWinner = async (
     return true;
   }
   catch (error) {
+    // console.log('error', error);
+  }
+
+  return false;
+};
+
+export const sendBackNftForRaffle = async (
+  raffleId: number,
+  mint: PublicKey
+): Promise<Boolean> => {
+
+  try {
+    const id = new anchor.BN(raffleId);
+    const [pool] = await PublicKey.findProgramAddress(
+      [Buffer.from(POOL_SEED),
+      id.toArrayLike(Buffer, 'le', 8),
+      mint.toBuffer()],
+      program.programId
+    );
+
+
+    let ataFrom = await getAssociatedTokenAddress(new PublicKey(mint), pool, true);
+    let ataTo = await getAssociatedTokenAddress(new PublicKey(mint), new PublicKey(
+      ADMIN_WALLET_PUB
+    ))
+
+    const builder = program.methods.sendBackNft();
+
+    console.log('sysvar', SYSVAR_SLOT_HASHES_PUBKEY.toString());
+    builder.accounts({
+      partner: ADMIN_WALLET.publicKey,
+      admin: new PublicKey( ADMIN_WALLET_PUB ),
+      pool: pool,
+      mint: new PublicKey(mint),
+      ataFrom: ataFrom,
+      ataTo: ataTo,
+      tokenProgram: TOKEN_PROGRAM_ID,
+      associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
+      systemProgram: SystemProgram.programId,
+      rent: SYSVAR_RENT_PUBKEY
+    });
+
+    builder.signers([ADMIN_WALLET]);
+    const response = await builder.simulate({
+      commitment: 'confirmed'
+    });
+    console.log('response', response);
+    if (!response) return false;
+    const txId = await builder.rpc();
+    console.log('txId', txId);
+    if (!txId) return false;
+
+    return true;
+  }
+  catch (error) {
+    return false;
     // console.log('error', error);
   }
 

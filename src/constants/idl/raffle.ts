@@ -316,7 +316,64 @@ export type Raffle = {
         }
       ],
       "args": []
-    }
+    },
+    {
+      "name": "sendBackNft",
+      "accounts": [
+        {
+          "name": "partner",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "admin",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "pool",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "mint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "ataFrom",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "ataTo",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "associatedTokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    
   ],
   "accounts": [
     {
@@ -461,7 +518,12 @@ export type Raffle = {
       "code": 6011,
       "name": "ClaimPrizeError",
       "msg": "Error in claim prize"
-    }
+    },
+    {
+      "code": 6012,
+      "name": "SendBackNftError",
+      "msg": "Error in send back nft"
+    },
   ]
 };
 
@@ -783,7 +845,64 @@ export const IDL: Raffle = {
         }
       ],
       "args": []
-    }
+    },
+    {
+      "name": "sendBackNft",
+      "accounts": [
+        {
+          "name": "partner",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "admin",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "pool",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "mint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "ataFrom",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "ataTo",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "associatedTokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    
   ],
   "accounts": [
     {
@@ -928,6 +1047,11 @@ export const IDL: Raffle = {
       "code": 6011,
       "name": "ClaimPrizeError",
       "msg": "Error in claim prize"
-    }
+    },
+    {
+      "code": 6012,
+      "name": "SendBackNftError",
+      "msg": "Error in send back nft"
+    },
   ]
 };
