@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 import bodyParser from 'body-parser';
 import dotenv from 'dotenv';
 import cors from 'cors';
+import axios from 'axios';
 // import passport from 'passport';
 import routes from './routes';
 import RaffleModel from './models/raffle';
@@ -21,7 +22,7 @@ import {
 import { delay } from './helpers/utils';
 import CONFIG from './config'
 
-const { WINNER_WALLET } = CONFIG
+const { WINNER_WALLET, DECIMAL } = CONFIG
 // require('./helpers/discordPassport');
 // require('./helpers/twitterPassport');
 
@@ -198,6 +199,50 @@ const checkAuctions = async () => {
   }
 }
 
+const updateFloorPrice = async () => {
+  try {
+    const currentTime = Math.floor(Date.now() / 1000);
+    const auctions = await AuctionModel.find({ state: 0 });
+    for (let i = 0; i < auctions.length; i++) {
+      let auction = auctions[i];
+      if (currentTime > auction.start_date && currentTime < auction.end_date) {
+        if( auction.tokenName.split('#').length < 2)
+          continue;
+        const collection = auction.tokenName.split('#')[0]
+        const collectionName = collection.slice(0, -1)  
+
+        const ME_Api = `https://api-mainnet.magiceden.io/rpc/getCollectionEscrowStats/${collectionName}?edge_cache=true&agg=3`
+        const result: any = await axios.get(ME_Api)
+        if(result?.results.floorPrice){
+          const floorPrice = result?.results.floorPrice
+          await AuctionModel.findOneAndUpdate({ id: auction.id}, { floorPrice: Number(floorPrice) / DECIMAL, last_updated_fp: new Date()})
+        }
+      }
+    }
+
+    const raffles = await RaffleModel.find({ state: 0 });
+    for (let i = 0; i < raffles.length; i++) {
+      let raffle = raffles[i];
+      if (currentTime > raffle.start_date && currentTime < raffle.end_date) {
+        if( raffle.tokenName.split('#').length < 2)
+          continue;
+        const collection = raffle.tokenName.split('#')[0]
+        const collectionName = collection.slice(0, -1)  
+
+        const ME_Api = `https://api-mainnet.magiceden.io/rpc/getCollectionEscrowStats/${collectionName}?edge_cache=true&agg=3`
+        const result: any = await axios.get(ME_Api)
+        if(result?.results.floorPrice){
+          const floorPrice = result?.results.floorPrice
+          await RaffleModel.findOneAndUpdate({ id: raffle.id}, { floorPrice: Number(floorPrice) / DECIMAL, last_updated_fp: new Date()})
+        }
+      }
+    }
+  }
+  catch (error) {
+    // console.log('error', error);
+  }
+}
+
 
 (async () => {
   for (let i = 0; i < 1;) {
@@ -206,3 +251,9 @@ const checkAuctions = async () => {
     await delay(60 * 1000)
   }
 })()
+
+setInterval(async () => {
+  await updateFloorPrice();
+}, 900 * 1000);
+
+
