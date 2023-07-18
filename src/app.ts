@@ -17,9 +17,10 @@ import {
   Keypair,
   Connection,
   Commitment,
-  ConnectionConfig
+  ConnectionConfig,
 } from '@solana/web3.js';
 import { delay } from './helpers/utils';
+import { getUnixTs } from './helpers/solana/connection';
 import CONFIG from './config'
 
 const { WINNER_WALLET, DECIMAL } = CONFIG
@@ -213,9 +214,10 @@ const updateFloorPrice = async () => {
 
         const ME_Api = `https://api-mainnet.magiceden.io/rpc/getCollectionEscrowStats/${collectionName}?edge_cache=true&agg=3`
         const result: any = await axios.get(ME_Api)
+        console.log('result', result)
         if(result?.results.floorPrice){
           const floorPrice = result?.results.floorPrice
-          await AuctionModel.findOneAndUpdate({ id: auction.id}, { floorPrice: Number(floorPrice) / DECIMAL, last_updated_fp: new Date()})
+          await AuctionModel.findOneAndUpdate({ id: auction.id}, { floor_price: Number(floorPrice) / DECIMAL, last_updated_fp: Math.floor(getUnixTs())})
         }
       }
     }
@@ -233,13 +235,13 @@ const updateFloorPrice = async () => {
         const result: any = await axios.get(ME_Api)
         if(result?.results.floorPrice){
           const floorPrice = result?.results.floorPrice
-          await RaffleModel.findOneAndUpdate({ id: raffle.id}, { floorPrice: Number(floorPrice) / DECIMAL, last_updated_fp: new Date()})
+          await RaffleModel.findOneAndUpdate({ id: raffle.id}, { floor_price: Number(floorPrice) / DECIMAL, last_updated_fp: Math.floor(getUnixTs())})
         }
       }
     }
   }
   catch (error) {
-    // console.log('error', error);
+    console.log('error', error);
   }
 }
 
@@ -254,6 +256,6 @@ const updateFloorPrice = async () => {
 
 setInterval(async () => {
   await updateFloorPrice();
-}, 900 * 1000);
+}, 10 * 60 * 1000);
 
 
