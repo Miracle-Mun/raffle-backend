@@ -3,6 +3,7 @@ import { model, Schema, models, Model } from 'mongoose';
 export interface Raffle {
   id: number | null,
   mint: string | null,
+  symbol: string | null,
   project: string | null,
   image: string | null,
   tokenName: string | null,
@@ -24,6 +25,7 @@ export interface Raffle {
 const Raffle: Schema<Raffle> = new Schema<Raffle>({
   id: { type: Number, required: true, unique: true },
   mint: { type: String, required: true },
+  symbol: { type: String, required: true },
   project: { type: String, required: true },
   image: { type: String },
   tokenName: { type: String },

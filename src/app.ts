@@ -12,6 +12,7 @@ import { setWinner, sendBackNftForRaffle } from './helpers/contract/raffle';
 import { sendBackNftForAuction } from './helpers/contract/auction';
 import * as anchor from "@project-serum/anchor";
 import NodeWallet from '@project-serum/anchor/dist/cjs/nodewallet';
+import fetchDataWithAxios from './helpers/fetchDataWithAxios';
 import { 
   PublicKey,   
   Keypair,
@@ -23,7 +24,7 @@ import { delay } from './helpers/utils';
 import { getUnixTs } from './helpers/solana/connection';
 import CONFIG from './config'
 
-const { WINNER_WALLET, DECIMAL } = CONFIG
+const { WINNER_WALLET, DECIMAL, MAGICEDEN_API_KEY } = CONFIG
 // require('./helpers/discordPassport');
 // require('./helpers/twitterPassport');
 
@@ -206,17 +207,26 @@ const updateFloorPrice = async () => {
     const auctions = await AuctionModel.find({ state: 0 });
     for (let i = 0; i < auctions.length; i++) {
       let auction = auctions[i];
-      if (currentTime > auction.start_date && currentTime < auction.end_date) {
-        if( auction.tokenName.split('#').length < 2)
-          continue;
-        const collection = auction.tokenName.split('#')[0]
-        const collectionName = collection.slice(0, -1)  
-
-        const ME_Api = `https://api-mainnet.magiceden.io/rpc/getCollectionEscrowStats/${collectionName}?edge_cache=true&agg=3`
-        const result: any = await axios.get(ME_Api)
+      if (currentTime > auction.start_date && auction.end_date) {
+        const ME_Api = `https://api-mainnet.magiceden.dev/v2/collections/${auction.symbol || ''}/stats`
+        let result:any
+ 
+        try {
+           result = await fetchDataWithAxios({
+             method: `get`,
+             route: `${ME_Api}`,
+             headerCred: {
+               autherization: MAGICEDEN_API_KEY
+             }
+           });
+         }
+         catch (err) {
+           console.log(`Error in communicating with magic eden`, err)
+         }
+ 
         console.log('result', result)
-        if(result?.results.floorPrice){
-          const floorPrice = result?.results.floorPrice
+        if(result && result.floor_price){
+          const floorPrice = result?.floorPrice
           await AuctionModel.findOneAndUpdate({ id: auction.id}, { floor_price: Number(floorPrice) / DECIMAL, last_updated_fp: Math.floor(getUnixTs())})
         }
       }
@@ -226,15 +236,24 @@ const updateFloorPrice = async () => {
     for (let i = 0; i < raffles.length; i++) {
       let raffle = raffles[i];
       if (currentTime > raffle.start_date && currentTime < raffle.end_date) {
-        if( raffle.tokenName.split('#').length < 2)
-          continue;
-        const collection = raffle.tokenName.split('#')[0]
-        const collectionName = collection.slice(0, -1)  
+        const ME_Api = `https://api-mainnet.magiceden.dev/v2/collections/${raffle.symbol || ''}/stats`
+        let result:any
 
-        const ME_Api = `https://api-mainnet.magiceden.io/rpc/getCollectionEscrowStats/${collectionName}?edge_cache=true&agg=3`
-        const result: any = await axios.get(ME_Api)
-        if(result?.results.floorPrice){
-          const floorPrice = result?.results.floorPrice
+        try {
+          result = await fetchDataWithAxios({
+            method: `get`,
+            route: `${ME_Api}`,
+            headerCred: {
+              autherization: MAGICEDEN_API_KEY
+            }
+          });
+        }
+        catch (err) {
+          console.log(`Error in communicating with magic eden`, err)
+        }
+
+        if(result && result.floor_price){
+          const floorPrice = result.floorPrice
           await RaffleModel.findOneAndUpdate({ id: raffle.id}, { floor_price: Number(floorPrice) / DECIMAL, last_updated_fp: Math.floor(getUnixTs())})
         }
       }
@@ -248,14 +267,14 @@ const updateFloorPrice = async () => {
 
 (async () => {
   for (let i = 0; i < 1;) {
-    await checkRaffles();
-    await checkAuctions();
-    await delay(60 * 1000)
+    await updateFloorPrice();
+    await delay(15 * 600 * 1000)
   }
 })()
 
 setInterval(async () => {
-  await updateFloorPrice();
-}, 10 * 60 * 1000);
+    await checkRaffles();
+    await checkAuctions();
+},  60 * 1000);
 
 

@@ -13,6 +13,7 @@ export default {
   DECIMAL: 1000000000,
   PRICEPERBYTE: 0.00000001,
   SOLANA_NETWORK: 'devnet',
+  MAGICEDEN_API_KEY: `c0f5e640-575c-417f-b5c9-4f9c91bbaab4`,
 
   AUCTION: {
     PROGRAM_ID: '2pKctoN7q3VoqWq78BKLGdwmGfzE2UHrPphqTm4D7pjH',
