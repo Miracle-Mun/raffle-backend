@@ -204,7 +204,7 @@ const checkAuctions = async () => {
 const updateFloorPrice = async () => {
   try {
     const currentTime = Math.floor(Date.now() / 1000);
-    const auctions = await AuctionModel.find({ state: 0 });
+    const auctions = await AuctionModel.find();
     for (let i = 0; i < auctions.length; i++) {
       let auction = auctions[i];
       if (currentTime > auction.start_date && auction.end_date) {
@@ -232,7 +232,7 @@ const updateFloorPrice = async () => {
       }
     }
 
-    const raffles = await RaffleModel.find({ state: 0 });
+    const raffles = await RaffleModel.find();
     for (let i = 0; i < raffles.length; i++) {
       let raffle = raffles[i];
       if (currentTime > raffle.start_date && currentTime < raffle.end_date) {
