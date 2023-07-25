@@ -207,7 +207,7 @@ const updateFloorPrice = async () => {
     const auctions = await AuctionModel.find();
     for (let i = 0; i < auctions.length; i++) {
       let auction = auctions[i];
-      if (currentTime > auction.start_date && auction.end_date) {
+      // if (currentTime > auction.start_date && auction.end_date) {
         const ME_Api = `https://api-mainnet.magiceden.dev/v2/collections/${auction.symbol || ''}/stats`
         let result:any
  
@@ -229,13 +229,13 @@ const updateFloorPrice = async () => {
           const floorPrice = result?.floorPrice
           await AuctionModel.findOneAndUpdate({ id: auction.id}, { floor_price: Number(floorPrice) / DECIMAL, last_updated_fp: Math.floor(getUnixTs())})
         }
-      }
+      // }
     }
 
     const raffles = await RaffleModel.find();
     for (let i = 0; i < raffles.length; i++) {
       let raffle = raffles[i];
-      if (currentTime > raffle.start_date && currentTime < raffle.end_date) {
+      // if (currentTime > raffle.start_date && currentTime < raffle.end_date) {
         const ME_Api = `https://api-mainnet.magiceden.dev/v2/collections/${raffle.symbol || ''}/stats`
         let result:any
 
@@ -256,7 +256,7 @@ const updateFloorPrice = async () => {
           const floorPrice = result.floorPrice
           await RaffleModel.findOneAndUpdate({ id: raffle.id}, { floor_price: Number(floorPrice) / DECIMAL, last_updated_fp: Math.floor(getUnixTs())})
         }
-      }
+      // }
     }
   }
   catch (error) {
