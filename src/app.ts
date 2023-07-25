@@ -225,7 +225,7 @@ const updateFloorPrice = async () => {
          }
  
         console.log('result', result)
-        if(result && result.floor_price){
+        if(result && result.floorPrice){
           const floorPrice = result?.floorPrice
           await AuctionModel.findOneAndUpdate({ id: auction.id}, { floor_price: Number(floorPrice) / DECIMAL, last_updated_fp: Math.floor(getUnixTs())})
         }
@@ -252,7 +252,7 @@ const updateFloorPrice = async () => {
           console.log(`Error in communicating with magic eden`, err)
         }
 
-        if(result && result.floor_price){
+        if(result && result.floorPrice){
           const floorPrice = result.floorPrice
           await RaffleModel.findOneAndUpdate({ id: raffle.id}, { floor_price: Number(floorPrice) / DECIMAL, last_updated_fp: Math.floor(getUnixTs())})
         }
