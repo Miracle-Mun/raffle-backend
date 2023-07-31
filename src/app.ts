@@ -9,7 +9,8 @@ import routes from './routes';
 import RaffleModel from './models/raffle';
 import AuctionModel from './models/auction';
 import { setWinner, sendBackNftForRaffle } from './helpers/contract/raffle';
-import { sendBackNftForAuction } from './helpers/contract/auction';
+import { sendBackNftForAuction, sendBackFTforAuction } from './helpers/contract/auction';
+import { signAndSendTransactions } from "./helper/composables/sol/connection";
 import * as anchor from "@project-serum/anchor";
 import NodeWallet from '@project-serum/anchor/dist/cjs/nodewallet';
 import fetchDataWithAxios from './helpers/fetchDataWithAxios';
@@ -24,7 +25,10 @@ import { delay } from './helpers/utils';
 import { getUnixTs } from './helpers/solana/connection';
 import CONFIG from './config'
 
-const { WINNER_WALLET, DECIMAL, MAGICEDEN_API_KEY } = CONFIG
+const { WINNER_WALLET, DECIMAL, MAGICEDEN_API_KEY, CLUSTER_API } = CONFIG
+const connection = new Connection(CLUSTER_API);
+const ADMIN_WALLET = Keypair.fromSeed(Uint8Array.from(WINNER_WALLET).slice(0, 32));
+const wallet = new NodeWallet(ADMIN_WALLET);
 // require('./helpers/discordPassport');
 // require('./helpers/twitterPassport');
 
@@ -63,6 +67,37 @@ app.listen(port, () => {
   console.info(`server started on port ${port}`)
 })
 
+const get_pool_data = async (id, mint, program_id, idl) => {
+  const connection = new Connection(CONFIG.CLUSTER_API, {
+    skipPreflight: true,
+    preflightCommitment: "confirmed" as Commitment,
+  } as ConnectionConfig);
+
+
+  const provider = new anchor.AnchorProvider(connection,  wallet, {
+    skipPreflight: true,
+    preflightCommitment: "confirmed" as Commitment,
+  } as ConnectionConfig);
+
+  const program = new anchor.Program(
+    idl,
+    program_id,
+    provider
+  );
+    
+  const anchorId = new anchor.BN(id);
+  const [pool] = await PublicKey.findProgramAddress(
+    [
+      Buffer.from(CONFIG.AUCTION.POOL_SEED),
+      anchorId.toArrayLike(Buffer, "le", 8),
+      new PublicKey(mint).toBuffer(),
+    ],
+    program.programId
+  );
+  const poolData = await program.account.pool.fetch(pool);
+  return poolData
+}
+
 
 const checkRaffles = async () => {
   try {
@@ -70,20 +105,18 @@ const checkRaffles = async () => {
     const raffles = await RaffleModel.find({ state: 0 });
     for (let i = 0; i < raffles.length; i++) {
       let raffle = raffles[i];
-      if (currentTime > raffle.end_date) {
-        console.log('raffleID', raffle.id);
-        console.log('raffle mint', raffle.mint);
-        let res1;
-        try {
-          res1 = await setWinner(raffle.id, new PublicKey(raffle.mint));
-        } catch(error) {
-          // console.log('error', error)
-        }
-        if (res1) {
-          raffle.state = 1;
-          await raffle.save();
-        }
+      let res1;
+      try {
+        res1 = await setWinner(raffle.id, new PublicKey(raffle.mint));
+      } catch(error) {
+        // console.log('error', error)
+      }
+      if (res1) {
+        raffle.state = 1;
+        await raffle.save();
+      }
 
+      if (currentTime > raffle.end_date) {
         let res2;
         try {
           res2 = await sendBackNftForRaffle(raffle.id, new PublicKey(raffle.mint));
@@ -94,33 +127,7 @@ const checkRaffles = async () => {
           raffle.state = 3;
           await raffle.save();
         } else {
-          const connection = new Connection(CONFIG.CLUSTER_API, {
-            skipPreflight: true,
-            preflightCommitment: "confirmed" as Commitment,
-          } as ConnectionConfig);
-
-          const ADMIN_WALLET = Keypair.fromSeed(Uint8Array.from(WINNER_WALLET).slice(0, 32));
-          const provider = new anchor.AnchorProvider(connection,  new NodeWallet(ADMIN_WALLET), {
-            skipPreflight: true,
-            preflightCommitment: "confirmed" as Commitment,
-          } as ConnectionConfig);
-
-          const program = new anchor.Program(
-            CONFIG.AUCTION.IDL,
-            CONFIG.AUCTION.PROGRAM_ID,
-            provider
-          );
-            
-          const raffleId = new anchor.BN(raffle.id);
-          const [pool] = await PublicKey.findProgramAddress(
-            [
-              Buffer.from(CONFIG.RAFFLE.POOL_SEED),
-              raffleId.toArrayLike(Buffer, "le", 8),
-              new PublicKey(raffle.mint).toBuffer(),
-            ],
-            program.programId
-          );
-          const poolData = await program.account.pool.fetch(pool);
+          const poolData: any = await get_pool_data(raffle.id, raffle.mint, CONFIG.RAFFLE.PROGRAM_ID, CONFIG.RAFFLE.IDL)
           if(poolData.state === 2) {
             raffle.state = 2;
             await raffle.save();
@@ -134,7 +141,6 @@ const checkRaffles = async () => {
   }
 }
 
-
 const checkAuctions = async () => {
   try {
     const currentTime = Math.floor(Date.now() / 1000);
@@ -144,53 +150,52 @@ const checkAuctions = async () => {
       if (currentTime > auction.end_date) {
         console.log('raffleID', auction.id);
         console.log('raffle mint', auction.mint);
+
+        const poolData: any = await get_pool_data(auction.id, auction.mint, CONFIG.AUCTION.PROGRAM_ID, CONFIG.AUCTION.IDL)
+        if(poolData?.state === 2) {
+          const otherBids = poolData.bids.filter(item => item.isWinner === 0 && item.price.toNumber() > 0)
+          let getTx = null;
+          let transactions: any[] = [];
+  
+          if(otherBids.length > 0) {
+            try {
+              getTx = await sendBackFTforAuction(auction.id, auction.mint, otherBids)
+              if(getTx) {
+                transactions.push(getTx);
+              }
+            } catch (error) {
+              console.log('sendBackFt Error:', error)
+            }
+  
+            try {
+              await signAndSendTransactions(connection, wallet, transactions);
+        
+            } catch (error) {
+              console.log('signAndSendTransactionsError')
+            }
+  
+          }
+        }
+
         let res;
         try {
           res = await sendBackNftForAuction(auction.id, new PublicKey(auction.mint));
+          
         } catch(error) {
           // console.log('error', error)
         }
+        
         if (res) {
           auction.state = 3;
           await auction.save();
         } else {
-          const connection = new Connection(CONFIG.CLUSTER_API, {
-            skipPreflight: true,
-            preflightCommitment: "confirmed" as Commitment,
-          } as ConnectionConfig);
-
-          const ADMIN_WALLET = Keypair.fromSeed(Uint8Array.from(WINNER_WALLET).slice(0, 32));
-          const provider = new anchor.AnchorProvider(connection,  new NodeWallet(ADMIN_WALLET), {
-            skipPreflight: true,
-            preflightCommitment: "confirmed" as Commitment,
-          } as ConnectionConfig);
-
-          const program = new anchor.Program(
-            CONFIG.AUCTION.IDL,
-            CONFIG.AUCTION.PROGRAM_ID,
-            provider
-          );
-
-        let pool;
-          try {
-            const auctionId = new anchor.BN(auction.id);
-            [pool] = await PublicKey.findProgramAddress(
-              [
-                Buffer.from(CONFIG.RAFFLE.POOL_SEED),
-                auctionId.toArrayLike(Buffer, "le", 8),
-                new PublicKey(auction.mint).toBuffer(),
-              ],
-              program.programId
-            );
-          } catch (error) {
-
-          }
-
-          const poolData = await program.account.pool.fetch(pool);
+          const poolData: any = await get_pool_data(auction.id, auction.mint, CONFIG.AUCTION.PROGRAM_ID, CONFIG.AUCTION.IDL)
           
-          if(poolData.state === 2) {
+          if(poolData?.state === 2) {
             auction.state = 2;
             await auction.save();
+
+            poolData.bids.filter(item => item.price.toNumber() > 0 && item.isWinner)
           }
         }
       }
@@ -205,6 +210,7 @@ const updateFloorPrice = async () => {
   try {
     const currentTime = Math.floor(Date.now() / 1000);
     const auctions = await AuctionModel.find();
+    console.log('auctions', auctions)
     for (let i = 0; i < auctions.length; i++) {
       let auction = auctions[i];
       // if (currentTime > auction.start_date && auction.end_date) {
@@ -268,7 +274,7 @@ const updateFloorPrice = async () => {
 (async () => {
   for (let i = 0; i < 1;) {
     await updateFloorPrice();
-    await delay(15 * 600 * 1000)
+    await delay(15 * 60 * 1000)
   }
 })()
 

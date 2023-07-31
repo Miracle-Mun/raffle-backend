@@ -14,6 +14,7 @@ export default {
   PRICEPERBYTE: 0.00000001,
   SOLANA_NETWORK: 'mainnet',
   MAGICEDEN_API_KEY: `c0f5e640-575c-417f-b5c9-4f9c91bbaab4`,
+  TOKEN_ADDRESS: '9aeip1QTVXNUVbcQ14UMDssmxNv4ve7sg8cVyfHoeNmT',
 
   AUCTION: {
     PROGRAM_ID: 'AHXFqPbBRnxPcNStkzQumQBfUV5L7vN1EL3i3jpKzpWn',
