@@ -152,7 +152,7 @@ const checkAuctions = async () => {
         console.log('raffle mint', auction.mint);
 
         const poolData: any = await get_pool_data(auction.id, auction.mint, CONFIG.AUCTION.PROGRAM_ID, CONFIG.AUCTION.IDL)
-        if(poolData?.state === 2) {
+        if(poolData?.state === 2 || poolData?.state === 1) {
           const otherBids = poolData.bids.filter(item => item.isWinner === 0 && item.price.toNumber() > 0)
           let getTx = null;
           let transactions: any[] = [];
