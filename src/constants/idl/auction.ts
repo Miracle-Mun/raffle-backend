@@ -69,6 +69,10 @@ export type Auction = {
           "type": "u64"
         },
         {
+          "name": "minIncrement",
+          "type": "u64"
+        },
+        {
           "name": "minNftCount",
           "type": "u32"
         }
@@ -99,6 +103,10 @@ export type Auction = {
         },
         {
           "name": "minPrice",
+          "type": "u64"
+        },
+        {
+          "name": "minIncrement",
           "type": "u64"
         },
         {
@@ -588,6 +596,10 @@ export type Auction = {
           },
           {
             "name": "minPrice",
+            "type": "u64"
+          },
+          {
+            "name": "minIncrement",
             "type": "u64"
           },
           {
@@ -818,6 +830,10 @@ export const IDL: Auction = {
           "type": "u64"
         },
         {
+          "name": "minIncrement",
+          "type": "u64"
+        },
+        {
           "name": "minNftCount",
           "type": "u32"
         }
@@ -848,6 +864,10 @@ export const IDL: Auction = {
         },
         {
           "name": "minPrice",
+          "type": "u64"
+        },
+        {
+          "name": "minIncrement",
           "type": "u64"
         },
         {
@@ -1337,6 +1357,10 @@ export const IDL: Auction = {
           },
           {
             "name": "minPrice",
+            "type": "u64"
+          },
+          {
+            "name": "minIncrement",
             "type": "u64"
           },
           {
