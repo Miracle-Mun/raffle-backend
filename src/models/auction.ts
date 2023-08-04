@@ -21,6 +21,7 @@ export interface Auction {
   start_date: number | null,
   end_date: number | null,
   state: number | null,
+  created_at: number | null,
 }
 
 const Auction: Schema<Auction> = new Schema<Auction>({
@@ -44,6 +45,7 @@ const Auction: Schema<Auction> = new Schema<Auction>({
   start_date: { type: Number, required: true },
   end_date: { type: Number, required: true },
   state: { type: Number, default: 0 },
+  created_at: { type: Number, default: Math.floor(Date.now() / 1000) },
 })
 
 

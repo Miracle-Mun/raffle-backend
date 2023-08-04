@@ -19,6 +19,7 @@ export interface Raffle {
   floor_price: number | null,
   last_updated_fp: number | null,
   start_date: number | null,
+  created_at: number | null,
   end_date: number | null,
   state: number | null
 }
@@ -42,6 +43,7 @@ const Raffle: Schema<Raffle> = new Schema<Raffle>({
   floor_price: { type: Number, required: true },
   last_updated_fp: { type: Number, required: true },
   start_date: { type: Number, required: true },
+  created_at: { type: Number, default: Math.floor(Date.now() / 1000) },
   end_date: { type: Number, required: true },
   state: { type: Number, default: 0 },
 })

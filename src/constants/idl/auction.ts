@@ -237,7 +237,7 @@ export type Auction = {
         {
           "name": "pool",
           "isMut": true,
-          "isSigner": false
+         "isSigner": false
         },
         {
           "name": "payMint",
@@ -285,7 +285,7 @@ export type Auction = {
           "type": "u32"
         }
       ]
-    },
+   },
     {
       "name": "cancelBid",
       "accounts": [
@@ -570,6 +570,22 @@ export type Auction = {
         }
       ],
       "args": []
+    },
+    {
+      "name": "setWinner",
+      "accounts": [
+        {
+          "name": "partner",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "pool",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": []
     }
   ],
   "accounts": [
@@ -653,7 +669,7 @@ export type Auction = {
           }
         ]
       }
-    }
+   }
   ],
   "errors": [
     {
@@ -701,7 +717,7 @@ export type Auction = {
       "name": "ClaimBidError",
       "msg": "Error in claim bid"
     },
-    {
+   {
       "code": 6009,
       "name": "AlreadyClaimed",
       "msg": "Already claimed"
@@ -998,7 +1014,7 @@ export const IDL: Auction = {
         {
           "name": "pool",
           "isMut": true,
-          "isSigner": false
+         "isSigner": false
         },
         {
           "name": "payMint",
@@ -1046,7 +1062,7 @@ export const IDL: Auction = {
           "type": "u32"
         }
       ]
-    },
+   },
     {
       "name": "cancelBid",
       "accounts": [
@@ -1331,6 +1347,22 @@ export const IDL: Auction = {
         }
       ],
       "args": []
+    },
+    {
+      "name": "setWinner",
+      "accounts": [
+        {
+          "name": "partner",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "pool",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": []
     }
   ],
   "accounts": [
@@ -1414,7 +1446,7 @@ export const IDL: Auction = {
           }
         ]
       }
-    }
+   }
   ],
   "errors": [
     {
@@ -1462,7 +1494,7 @@ export const IDL: Auction = {
       "name": "ClaimBidError",
       "msg": "Error in claim bid"
     },
-    {
+   {
       "code": 6009,
       "name": "AlreadyClaimed",
       "msg": "Already claimed"

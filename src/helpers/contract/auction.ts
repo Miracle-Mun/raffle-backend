@@ -302,3 +302,43 @@ export const sendBackFTforAuction = async (
     return null;
   }
 }
+
+export const setWinnerForAuction = async (
+  auctionId: number,
+  mint: PublicKey
+): Promise<Boolean> => {
+
+  try {
+    const id = new anchor.BN(auctionId);
+    const [pool] = await PublicKey.findProgramAddress(
+      [Buffer.from(POOL_SEED),
+      id.toArrayLike(Buffer, 'le', 8),
+      mint.toBuffer()],
+      program.programId
+    );
+
+    const builder = program.methods.setWinner();
+
+    builder.accounts({
+      partner: ADMIN_WALLET.publicKey,
+      pool: pool
+    });
+
+    builder.signers([ADMIN_WALLET]);
+    const response = await builder.simulate({
+      commitment: 'confirmed'
+    });
+    console.log('response', response);
+    if (!response) return false;
+    const txId = await builder.rpc();
+    console.log('txId', txId);
+    if (!txId) return false;
+
+    return true;
+  }
+  catch (error) {
+    // console.log('error', error);
+  }
+
+  return false;
+};

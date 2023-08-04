@@ -22,6 +22,7 @@
     "typescript": "^4.6.2"
   },
   "dependencies": {
+    "@hellomoon/api": "^1.17.2",
     "@metaplex-foundation/js": "^0.18.3",
     "@metaplex/arweave-cost": "^2.0.0",
     "@nfteyez/sol-rayz": "^0.10.2",
