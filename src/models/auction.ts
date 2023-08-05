@@ -45,7 +45,7 @@ const Auction: Schema<Auction> = new Schema<Auction>({
   start_date: { type: Number, required: true },
   end_date: { type: Number, required: true },
   state: { type: Number, default: 0 },
-  created_at: { type: Number, default: Math.floor(Date.now() / 1000) },
+  created_at: { type: Number, default: Date.now() / 1000 },
 })
 
 

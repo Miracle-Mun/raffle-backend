@@ -43,7 +43,7 @@ const Raffle: Schema<Raffle> = new Schema<Raffle>({
   floor_price: { type: Number, required: true },
   last_updated_fp: { type: Number, required: true },
   start_date: { type: Number, required: true },
-  created_at: { type: Number, default: Math.floor(Date.now() / 1000) },
+  created_at: { type: Number, default: Date.now() / 1000 },
   end_date: { type: Number, required: true },
   state: { type: Number, default: 0 },
 })

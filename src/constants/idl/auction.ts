@@ -69,7 +69,7 @@ export type Auction = {
           "type": "u64"
         },
         {
-          "name": "minIncrement",
+          "name": "bidIncrement",
           "type": "u64"
         },
         {
@@ -106,7 +106,7 @@ export type Auction = {
           "type": "u64"
         },
         {
-          "name": "minIncrement",
+          "name": "bidIncrement",
           "type": "u64"
         },
         {
@@ -615,7 +615,7 @@ export type Auction = {
             "type": "u64"
           },
           {
-            "name": "minIncrement",
+            "name": "bidIncrement",
             "type": "u64"
           },
           {
@@ -846,7 +846,7 @@ export const IDL: Auction = {
           "type": "u64"
         },
         {
-          "name": "minIncrement",
+          "name": "bidIncrement",
           "type": "u64"
         },
         {
@@ -883,7 +883,7 @@ export const IDL: Auction = {
           "type": "u64"
         },
         {
-          "name": "minIncrement",
+          "name": "bidIncrement",
           "type": "u64"
         },
         {
@@ -1392,7 +1392,7 @@ export const IDL: Auction = {
             "type": "u64"
           },
           {
-            "name": "minIncrement",
+            "name": "bidIncrement",
             "type": "u64"
           },
           {

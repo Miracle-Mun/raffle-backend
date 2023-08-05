@@ -24,6 +24,8 @@ import {
 import { delay } from './helpers/utils';
 import { getUnixTs } from './helpers/solana/connection';
 import CONFIG from './config'
+const Promise1 = require('bluebird') ;
+
 const { RestClient, CollectionMintsRequest, CollectionFloorpriceRequest }: any = require("@hellomoon/api");
 const { WINNER_WALLET, DECIMAL, MAGICEDEN_API_KEY, CLUSTER_API } = CONFIG
 const connection = new Connection(CLUSTER_API);
@@ -103,8 +105,8 @@ const checkRaffles = async () => {
   try {
     const currentTime = Math.floor(Date.now() / 1000);
     const raffles = await RaffleModel.find({ state: 0 });
-    for (let i = 0; i < raffles.length; i++) {
-      let raffle = raffles[i];
+
+    await Promise1.all(raffles.map(async (raffle) => {
       let res1;
       try {
         res1 = await setWinner(raffle.id, new PublicKey(raffle.mint));
@@ -134,7 +136,7 @@ const checkRaffles = async () => {
           }
         }
       }
-    }
+    }))
   }
   catch (error) {
     // console.log('error', error);
@@ -145,9 +147,8 @@ const checkAuctions = async () => {
   try {
     const currentTime = Math.floor(Date.now() / 1000);
     const auctions = await AuctionModel.find({ state: 0 });
-    for (let i = 0; i < auctions.length; i++) {
-      let auction = auctions[i];
 
+    await Promise1.all(auctions.map(async (auction: any) => {
       if (currentTime > auction.end_date) {
         let res1;
         try {
@@ -155,39 +156,40 @@ const checkAuctions = async () => {
         } catch(error) {
           // console.log('error', error)
         }
-        
-        console.log('raffleID', auction.id);
-        console.log('raffle mint', auction.mint);
 
-        await delay(60 * 1000)
-        const poolData: any = await get_pool_data(auction.id, auction.mint, CONFIG.AUCTION.PROGRAM_ID, CONFIG.AUCTION.IDL)
-        if(poolData?.state === 1) {
-          const otherBids = poolData.bids.filter(item => item.isWinner === 0 && item.price.toNumber() > 0)
-          console.log('otherBids', otherBids)
-          let getTx = null;
-          let transactions: any[] = [];
-  
-          if(otherBids.length > 0) {
-            try {
-              getTx = await sendBackFTforAuction(auction.id, auction.mint, otherBids)
-              if(getTx) {
-                transactions.push(getTx);
+        if(res1) {
+          // await delay(60 * 1000)
+          const poolData: any = await get_pool_data(auction.id, auction.mint, CONFIG.AUCTION.PROGRAM_ID, CONFIG.AUCTION.IDL)
+          if(poolData?.state === 1) {
+            const otherBids = poolData.bids.filter(item => item.isWinner === 0 && item.price.toNumber() > 0)
+            console.log('otherBids', otherBids)
+            let getTx = null;
+            let transactions: any[] = [];
+    
+            if(otherBids.length > 0) {
+              try {
+                getTx = await sendBackFTforAuction(auction.id, auction.mint, otherBids)
+                if(getTx) {
+                  transactions.push(getTx);
+                }
+              } catch (error) {
+                console.log('sendBackFt Error:', error)
               }
-            } catch (error) {
-              console.log('sendBackFt Error:', error)
+    
+              try {
+                await signAndSendTransactions(connection, wallet, transactions);
+          
+              } catch (error) {
+                console.log('signAndSendTransactionsError')
+              }
+    
             }
-  
-            try {
-              await signAndSendTransactions(connection, wallet, transactions);
-        
-            } catch (error) {
-              console.log('signAndSendTransactionsError')
-            }
-  
+            auction.state = 1;
+            await auction.save();
           }
-          auction.state = 1;
-          await auction.save();
+
         }
+        
         let res;
         try {
           res = await sendBackNftForAuction(auction.id, new PublicKey(auction.mint));
@@ -210,7 +212,7 @@ const checkAuctions = async () => {
           }
         }
       }
-    }
+    }))
   }
   catch (error) {
     // console.log('error', error);
@@ -314,14 +316,15 @@ const updateFloorPrice = async () => {
 
 (async () => {
   for (let i = 0; i < 1;) {
-    await updateFloorPrice();
-    await delay(15 * 60 * 1000)
+    await checkRaffles();
+    await checkAuctions();
+    await delay(60 * 1000)
   }
 })()
 
 setInterval(async () => {
-    await checkRaffles();
-    await checkAuctions();
-},  60 * 1000);
+  await updateFloorPrice();
+
+},  15 * 60 * 1000);
 
 
