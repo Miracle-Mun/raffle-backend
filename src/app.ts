@@ -8,7 +8,7 @@ import axios from 'axios';
 import routes from './routes';
 import RaffleModel from './models/raffle';
 import AuctionModel from './models/auction';
-import { setWinner, sendBackNftForRaffle } from './helpers/contract/raffle';
+import { setWinnerForRaffle, sendBackNftForRaffle } from './helpers/contract/raffle';
 import { sendBackNftForAuction, sendBackFTforAuction, setWinnerForAuction } from './helpers/contract/auction';
 import { signAndSendTransactions } from "./helper/composables/sol/connection";
 import * as anchor from "@project-serum/anchor";
@@ -31,6 +31,7 @@ const { WINNER_WALLET, DECIMAL, MAGICEDEN_API_KEY, CLUSTER_API } = CONFIG
 const connection = new Connection(CLUSTER_API);
 const ADMIN_WALLET = Keypair.fromSeed(Uint8Array.from(WINNER_WALLET).slice(0, 32));
 const wallet = new NodeWallet(ADMIN_WALLET);
+const currentTime = Math.floor(Date.now() / 1000);
 // require('./helpers/discordPassport');
 // require('./helpers/twitterPassport');
 
@@ -100,40 +101,47 @@ const get_pool_data = async (id, mint, program_id, idl) => {
   return poolData
 }
 
-
-const checkRaffles = async () => {
+const setWinnerRaffleAuction = async () => {
   try {
-    const currentTime = Math.floor(Date.now() / 1000);
+    console.log('+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++')
     const raffles = await RaffleModel.find({ state: 0 });
+    await Promise.all(raffles.map(async (raffle: any) => {
+      if (Date.now() > raffle.end_date * 1000) {
+        const res = await setWinnerForRaffle(raffle.id, new PublicKey(raffle.mint));
+        if(res) {
+          raffle.state = 1;
+          await raffle.save();
+        }    
+      }
+    }))
+
+    const auctions = await AuctionModel.find({ state: 0 });
+    await Promise1.all(auctions.map(async (auction: any) => {
+      if (Date.now() > auction.end_date * 1000) {
+        const res = await setWinnerForAuction(auction.id, new PublicKey(auction.mint));
+        if(res) {
+          auction.state = 1;
+          await auction.save();
+        }    
+      }
+    }))
+
+  } catch (error) {
+    
+  }
+}
+
+
+const sendBackRaffles = async () => {
+  try {
+    const raffles = await RaffleModel.find({ state: 1 });
 
     await Promise1.all(raffles.map(async (raffle) => {
-      let res1;
-      try {
-        res1 = await setWinner(raffle.id, new PublicKey(raffle.mint));
-      } catch(error) {
-        // console.log('error', error)
-      }
-      if (res1) {
-        raffle.state = 1;
-        await raffle.save();
-      }
-
-      if (currentTime > raffle.end_date) {
-        let res2;
-        try {
-          res2 = await sendBackNftForRaffle(raffle.id, new PublicKey(raffle.mint));
-        } catch(error) {
-        
-        }
-        if (res2) {
+      if (currentTime > raffle.end_date) { 
+        const res = await sendBackNftForRaffle(raffle.id, new PublicKey(raffle.mint));
+        if (res) {
           raffle.state = 3;
           await raffle.save();
-        } else {
-          const poolData: any = await get_pool_data(raffle.id, raffle.mint, CONFIG.RAFFLE.PROGRAM_ID, CONFIG.RAFFLE.IDL)
-          if(poolData.state === 2) {
-            raffle.state = 2;
-            await raffle.save();
-          }
         }
       }
     }))
@@ -143,74 +151,44 @@ const checkRaffles = async () => {
   }
 }
 
-const checkAuctions = async () => {
+const sendBackAuctions = async () => {
   try {
-    const currentTime = Math.floor(Date.now() / 1000);
-    const auctions = await AuctionModel.find({ state: 0 });
+    const auctions = await AuctionModel.find({ state: 1 });
 
     await Promise1.all(auctions.map(async (auction: any) => {
       if (currentTime > auction.end_date) {
-        let res1;
-        try {
-          res1 = await setWinnerForAuction(auction.id, new PublicKey(auction.mint));
-        } catch(error) {
-          // console.log('error', error)
-        }
+      console.log('123123')
+       const res = await sendBackNftForAuction(auction.id, new PublicKey(auction.mint));
+       if (res) {
+        auction.state = 3;
+        await auction.save();
+      } 
+        const poolData: any = await get_pool_data(auction.id, auction.mint, CONFIG.AUCTION.PROGRAM_ID, CONFIG.AUCTION.IDL)
+        const otherBids = poolData.bids.filter(item => item.isWinner === 0 && item.price.toNumber() > 0)
+        let getTx = null;
+        let transactions: any[] = [];
 
-        if(res1) {
-          // await delay(60 * 1000)
-          const poolData: any = await get_pool_data(auction.id, auction.mint, CONFIG.AUCTION.PROGRAM_ID, CONFIG.AUCTION.IDL)
-          if(poolData?.state === 1) {
-            const otherBids = poolData.bids.filter(item => item.isWinner === 0 && item.price.toNumber() > 0)
-            console.log('otherBids', otherBids)
-            let getTx = null;
-            let transactions: any[] = [];
-    
-            if(otherBids.length > 0) {
-              try {
-                getTx = await sendBackFTforAuction(auction.id, auction.mint, otherBids)
-                if(getTx) {
-                  transactions.push(getTx);
-                }
-              } catch (error) {
-                console.log('sendBackFt Error:', error)
-              }
-    
-              try {
-                await signAndSendTransactions(connection, wallet, transactions);
-          
-              } catch (error) {
-                console.log('signAndSendTransactionsError')
-              }
-    
+        if(otherBids.length > 0) {
+          try {
+            getTx = await sendBackFTforAuction(auction.id, auction.mint, otherBids)
+            if(getTx) {
+              transactions.push(getTx);
             }
-            auction.state = 1;
-            await auction.save();
+          } catch (error) {
+            console.log('sendBackFt Error:', error)
           }
 
-        }
-        
-        let res;
-        try {
-          res = await sendBackNftForAuction(auction.id, new PublicKey(auction.mint));
-          
-        } catch(error) {
-          // console.log('error', error)
-        }
-        
-        if (res) {
-          auction.state = 3;
-          await auction.save();
-        } else {
-          const poolData: any = await get_pool_data(auction.id, auction.mint, CONFIG.AUCTION.PROGRAM_ID, CONFIG.AUCTION.IDL)
-          
-          if(poolData?.state === 2) {
-            auction.state = 2;
-            await auction.save();
-
-            poolData.bids.filter(item => item.price.toNumber() > 0 && item.isWinner)
+          try {
+            const res = await signAndSendTransactions(connection, wallet, transactions);
+            console.log('res')
+            if (res?.txid) {
+              auction.state = 4;
+              await auction.save();
+            }
+          } catch (error) {
+            console.log('signAndSendTransactionsError')
           }
-        }
+        }  
       }
     }))
   }
@@ -221,7 +199,6 @@ const checkAuctions = async () => {
 
 const updateFloorPrice = async () => {
   try {
-    const currentTime = Math.floor(Date.now() / 1000);
     const auctions = await AuctionModel.find();
     console.log('auctions', auctions)
     for (let i = 0; i < auctions.length; i++) {
@@ -316,8 +293,10 @@ const updateFloorPrice = async () => {
 
 (async () => {
   for (let i = 0; i < 1;) {
-    await checkRaffles();
-    await checkAuctions();
+    await setWinnerRaffleAuction();
+    await sendBackRaffles();
+    await sendBackAuctions();
+
     await delay(60 * 1000)
   }
 })()

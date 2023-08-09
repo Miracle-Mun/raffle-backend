@@ -392,7 +392,7 @@ export type Auction = {
       "name": "claimPrize",
       "accounts": [
         {
-          "name": "admin",
+          "name": "community",
           "isMut": true,
           "isSigner": false
         },
@@ -666,7 +666,11 @@ export type Auction = {
           {
             "name": "isWinner",
             "type": "u32"
-          }
+          },
+          // {
+          //   "name": "claimed_prize",
+          //   "type": "u32"
+          // },
         ]
       }
    }
@@ -1169,7 +1173,7 @@ export const IDL: Auction = {
       "name": "claimPrize",
       "accounts": [
         {
-          "name": "admin",
+          "name": "community",
           "isMut": true,
           "isSigner": false
         },
@@ -1443,7 +1447,11 @@ export const IDL: Auction = {
           {
             "name": "isWinner",
             "type": "u32"
-          }
+          },
+          // {
+          //   "name": "claimed_prize",
+          //   "type": "u32"
+          // },
         ]
       }
    }

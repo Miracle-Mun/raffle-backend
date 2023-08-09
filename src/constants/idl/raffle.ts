@@ -179,7 +179,7 @@ export type Raffle = {
           "isSigner": true
         },
         {
-          "name": "admin",
+          "name": "community",
           "isMut": true,
           "isSigner": false
         },
@@ -507,6 +507,10 @@ export type Raffle = {
           },
           {
             "name": "isWinner",
+            "type": "u32"
+          },
+          {
+            "name": "claimedPrize",
             "type": "u32"
           }
         ]
@@ -763,7 +767,7 @@ export const IDL: Raffle = {
           "isSigner": true
         },
         {
-          "name": "admin",
+          "name": "community",
           "isMut": true,
           "isSigner": false
         },
@@ -1091,6 +1095,10 @@ export const IDL: Raffle = {
           },
           {
             "name": "isWinner",
+            "type": "u32"
+          },
+          {
+            "name": "claimedPrize",
             "type": "u32"
           }
         ]

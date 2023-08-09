@@ -17,14 +17,14 @@ export default {
   TOKEN_ADDRESS: '55u5jMiJtwsvyo834R2mmcrxMGu7x2KvbrguJNbHFnEJ',
 
   AUCTION: {
-    PROGRAM_ID: 'G4xDbEByUfbwPivCKjrZ4HeHGuUnrkrZJq5yfdytqbVr',
+    PROGRAM_ID: '4jXT35nGLxpVMYhkZbtVdQHMo5GgCxbkGcb6QeHPyGQd',
     POOL_SEED: 'pool',
     IDL: AUCTION_IDL.IDL,
     PAY_TOKEN_DECIMAL: 1000000000,
     message: 'Auction Message'
   },
   RAFFLE: {
-    PROGRAM_ID: 'FinEbPq6qYgmjmF3qZTi6NLLDRnz2n3N1SgMnZTyKpvt',
+    PROGRAM_ID: '8TH3GT2xC8pfddhdPv67vKFtxxjb5Ht1UUmca6fktatr',
     POOL_SEED: 'pool',
     IDL: RAFFLE_IDL.IDL,
     PAY_TOKEN_DECIMAL: 1000000000,

@@ -201,7 +201,7 @@ const program = new anchor.Program(IDL, PROGRAM_ID, provider);
 // };
 
 
-export const setWinner = async (
+export const setWinnerForRaffle = async (
   raffleId: number,
   mint: PublicKey
 ): Promise<Boolean> => {
@@ -217,7 +217,6 @@ export const setWinner = async (
 
     const builder = program.methods.setWinner();
 
-    console.log('sysvar', SYSVAR_SLOT_HASHES_PUBKEY.toString());
     builder.accounts({
       admin: ADMIN_WALLET.publicKey,
       pool: pool,
@@ -265,7 +264,6 @@ export const sendBackNftForRaffle = async (
 
     const builder = program.methods.sendBackNft();
 
-    console.log('sysvar', SYSVAR_SLOT_HASHES_PUBKEY.toString());
     builder.accounts({
       partner: ADMIN_WALLET.publicKey,
       admin: new PublicKey( ADMIN_WALLET_PUB ),
