@@ -169,25 +169,35 @@ const sendBackAuctions = async () => {
         let transactions: any[] = [];
 
         if(otherBids.length > 0) {
-          try {
-            getTx = await sendBackFTforAuction(auction.id, auction.mint, otherBids)
-            if(getTx) {
-              transactions.push(getTx);
+          let result = false
+          const chunkSize = 5
+          for (let i = 0; i < otherBids.length; i += chunkSize) {
+            const chunk = otherBids.slice(i, i + chunkSize);
+            try {
+              getTx = await sendBackFTforAuction(auction.id, auction.mint, chunk)
+              if(getTx) {
+                transactions.push(getTx);
+              }
+            } catch (error) {
+              console.log('sendBackFt Error:', error)
             }
-          } catch (error) {
-            console.log('sendBackFt Error:', error)
+  
+            try {
+              const res = await signAndSendTransactions(connection, wallet, transactions);
+              console.log('res')
+              if (res?.txid && res?.slot) {
+                result &&= true
+              }
+              
+            } catch (error) {
+              console.log('signAndSendTransactionsError')
+            }
+          }
+          if (result) {
+            auction.state = 4;
+            await auction.save();
           }
 
-          try {
-            const res = await signAndSendTransactions(connection, wallet, transactions);
-            console.log('res')
-            if (res?.txid) {
-              auction.state = 4;
-              await auction.save();
-            }
-          } catch (error) {
-            console.log('signAndSendTransactionsError')
-          }
         }  
       }
     }))
