@@ -186,7 +186,7 @@ const sendBackAuctions = async () => {
               const res = await signAndSendTransactions(connection, wallet, transactions);
               console.log('res')
               if (res?.txid && res?.slot) {
-                result &&= true
+                result = true
               }
               
             } catch (error) {
