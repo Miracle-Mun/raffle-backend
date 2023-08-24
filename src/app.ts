@@ -31,7 +31,6 @@ const { WINNER_WALLET, DECIMAL, MAGICEDEN_API_KEY, CLUSTER_API } = CONFIG
 const connection = new Connection(CLUSTER_API);
 const ADMIN_WALLET = Keypair.fromSeed(Uint8Array.from(WINNER_WALLET).slice(0, 32));
 const wallet = new NodeWallet(ADMIN_WALLET);
-const currentTime = Math.floor(Date.now() / 1000);
 // require('./helpers/discordPassport');
 // require('./helpers/twitterPassport');
 
@@ -103,7 +102,6 @@ const get_pool_data = async (id, mint, program_id, idl) => {
 
 const setWinnerRaffleAuction = async () => {
   try {
-    console.log('+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++')
     const raffles = await RaffleModel.find({ state: 0 });
     await Promise.all(raffles.map(async (raffle: any) => {
       if (Date.now() > raffle.end_date * 1000) {
@@ -137,6 +135,7 @@ const sendBackRaffles = async () => {
     const raffles = await RaffleModel.find({ state: 1 });
 
     await Promise1.all(raffles.map(async (raffle) => {
+      const currentTime = Math.floor(Date.now() / 1000);
       if (currentTime > raffle.end_date) { 
         const res = await sendBackNftForRaffle(raffle.id, new PublicKey(raffle.mint));
         if (res) {
@@ -153,28 +152,51 @@ const sendBackRaffles = async () => {
 
 const sendBackAuctions = async () => {
   try {
-    const auctions = await AuctionModel.find({ state: 1 });
+    const auctions = await AuctionModel.find({ state: 1 || 4});
 
     await Promise1.all(auctions.map(async (auction: any) => {
+      const currentTime = Math.floor(Date.now() / 1000);
       if (currentTime > auction.end_date) {
-      console.log('123123')
        const res = await sendBackNftForAuction(auction.id, new PublicKey(auction.mint));
        if (res) {
         auction.state = 3;
         await auction.save();
       } 
+      }
+    }))
+  }
+  catch (error) {
+    // console.log('error', error);
+  }
+}
+
+const sendBackFtAuctions = async () => {
+  try {
+    const auctions = await AuctionModel.find({ state: 1});
+    console.log('auctions=================', auctions)
+
+    await Promise1.all(auctions.map(async (auction: any) => {
+      const currentTime = Math.floor(Date.now() / 1000);
+      console.log('currentTime=============', currentTime)
+      console.log('auction.end_date=============', auction.end_date)
+      if (currentTime > auction.end_date) {
+        console.log('currentTime------------', currentTime)
         const poolData: any = await get_pool_data(auction.id, auction.mint, CONFIG.AUCTION.PROGRAM_ID, CONFIG.AUCTION.IDL)
-        const otherBids = poolData.bids.filter(item => item.isWinner === 0 && item.price.toNumber() > 0)
-        let getTx = null;
-        let transactions: any[] = [];
+        console.log('poolData==================', poolData)
+        const otherBids = poolData.bids.filter(item => item.isWinner === 0 && (item.price.toNumber() > 0))
+    
+        console.log('otherBids====================', otherBids)
 
         if(otherBids.length > 0) {
           let result = false
           const chunkSize = 5
           for (let i = 0; i < otherBids.length; i += chunkSize) {
+            let getTx = null;
+            let transactions: any[] = [];
             const chunk = otherBids.slice(i, i + chunkSize);
             try {
               getTx = await sendBackFTforAuction(auction.id, auction.mint, chunk)
+              console.log('getTx==========================', getTx)
               if(getTx) {
                 transactions.push(getTx);
               }
@@ -184,7 +206,6 @@ const sendBackAuctions = async () => {
   
             try {
               const res = await signAndSendTransactions(connection, wallet, transactions);
-              console.log('res')
               if (res?.txid && res?.slot) {
                 result = true
               }
@@ -210,30 +231,12 @@ const sendBackAuctions = async () => {
 const updateFloorPrice = async () => {
   try {
     const auctions = await AuctionModel.find();
-    console.log('auctions', auctions)
     for (let i = 0; i < auctions.length; i++) {
       let auction = auctions[i];
-      // if (currentTime > auction.start_date && auction.end_date) {
-        // const ME_Api = `https://api-mainnet.magiceden.dev/v2/collections/${auction.symbol || ''}/stats`
-        // let result:any
- 
-        // try {
-        //    result = await fetchDataWithAxios({
-        //      method: `get`,
-        //      route: `${ME_Api}`,
-        //      headerCred: {
-        //        autherization: MAGICEDEN_API_KEY
-        //      }
-        //    });
-        //  }
-        //  catch (err) {
-        //    console.log(`Error in communicating with magic eden`, err)
-        //  }
         let result: any
         try {
           const client = new RestClient(process.env.HELLOMOON_API_KEY);
           const res = await client.send(new CollectionMintsRequest({ nftMint: auction.mint }))
-          console.log("res", res)
           if(res && res.data) {
             const helloMoonCollectionId = res.data[0]?.helloMoonCollectionId       
             const client = new RestClient(process.env.HELLOMOON_API_KEY);
@@ -244,39 +247,20 @@ const updateFloorPrice = async () => {
           console.log(`Error in communicating with Hellomoon Api`, error)
         }
  
-        console.log('result', result)
         if(result && result.data){
           const floorPrice = result?.data[0]?.floorPriceLamports
           await AuctionModel.findOneAndUpdate({ id: auction.id}, { floor_price: Number(floorPrice) / DECIMAL, last_updated_fp: Math.floor(getUnixTs())})
         }
-      // }
     }
 
     const raffles = await RaffleModel.find();
     for (let i = 0; i < raffles.length; i++) {
       let raffle = raffles[i];
-      // if (currentTime > raffle.start_date && currentTime < raffle.end_date) {
-        // const ME_Api = `https://api-mainnet.magiceden.dev/v2/collections/${raffle.symbol || ''}/stats`
-        // let result:any
-
-        // try {
-        //   result = await fetchDataWithAxios({
-        //     method: `get`,
-        //     route: `${ME_Api}`,
-        //     headerCred: {
-        //       autherization: MAGICEDEN_API_KEY
-        //     }
-        //   });
-        // }
-        // catch (err) {
-        //   console.log(`Error in communicating with magic eden`, err)
-        // }
 
         let result: any
         try {
           const client = new RestClient(process.env.HELLOMOON_API_KEY);
           const res = await client.send(new CollectionMintsRequest({ nftMint: raffle.mint }))
-          console.log("res", res)
           if(res && res.data) {
             const helloMoonCollectionId = res.data[0]?.helloMoonCollectionId       
             const client = new RestClient(process.env.HELLOMOON_API_KEY);
@@ -287,7 +271,6 @@ const updateFloorPrice = async () => {
           console.log(`Error in communicating with Hellomoon Api`, error)
         }
  
-        console.log('result', result)
         if(result && result.data){
           const floorPrice = result?.data[0]?.floorPriceLamports
           await RaffleModel.findOneAndUpdate({ id: raffle.id}, { floor_price: Number(floorPrice) / DECIMAL, last_updated_fp: Math.floor(getUnixTs())})
@@ -304,6 +287,7 @@ const updateFloorPrice = async () => {
 (async () => {
   for (let i = 0; i < 1;) {
     await setWinnerRaffleAuction();
+    await sendBackFtAuctions();
     await sendBackRaffles();
     await sendBackAuctions();
 
